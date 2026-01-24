@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\BookTranslate;
 use App\Models\CharacteristicValue;
+use App\Models\Tag;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -18,6 +19,10 @@ class Book extends Model
 
     public function translates(){
         return $this->hasMany(BookTranslate::class, 'book_id', 'id');
+    }
+
+    public function tags(){
+        return $this->belongsToMany(Tag::class, 'books_tags'); 
     }
 
 }

@@ -1,5 +1,5 @@
 var currKey = null;
-var bookChars, bookCharsVals, bookCharsValsFromDB;
+var bookChars, bookCharsVals, bookCharsValsFromDB, bookTags, currentBookTags;
 var bookCharTemplate = `
 <div class="book__char">
   <div class="book__charMain">
@@ -28,10 +28,15 @@ $(document).ready(function () {
   recountLimitTotal();
   makeLanguagesTabs();
   makePaGagesTabs();
-  bookInit();
-  bookAddCreate();
-  reinitBookSelects();
-  
+
+  if($('.bookPage').length){
+    bookInit();
+    bookAddCreate();
+    reinitBookSelects();
+    tagsInit();
+  }
+
+
   $('.log__header').click(function() {
     $(this).closest('td').find('.log__body').toggleClass('show')
   });
@@ -1230,8 +1235,11 @@ function bookInit(){
   if(!$('#characteristics')[0]) return;
   bookChars = JSON.parse($('#characteristics')[0].innerHTML);
   bookCharsVals = JSON.parse($('#chars_vals')[0].innerHTML);
-  bookCharsValsFromDB = JSON.parse($('#book_chars_vals')[0].innerHTML);
+  bookTags = JSON.parse($('#tags')[0].innerHTML);
 
+  if($('#book_chars_vals')[0]){
+    bookCharsValsFromDB = JSON.parse($('#book_chars_vals')[0].innerHTML);
+  }
 
 
   reinitBookSelects();
@@ -1284,13 +1292,60 @@ function reinitBookSelects(){
       currentBookCharsVals.forEach(c => {
         charValsOpetionsHTML += `<option  value="${c.id}">${c.translates.ua.name}</option>`
       });
-      console.log(select, currentBookCharsVals);
       
       $(select).closest('.book__char').find('.book__charVal__select').html(charValsOpetionsHTML)
     }
   })
 }
 
+
+function tagsInit(){
+  var searchResultCont = $('.addTags__searchResultCont');
+  var currentTags = $('.currentTags');
+
+  $('#add_tag')[0].oninput = function(){
+    searchResultCont.html('');
+    
+    // if(this.value.length < 3) return;
+    if(this.value.trim() === ''){
+      searchResultCont.removeClass('show');
+      return;
+    }
+
+    var tagsFilter = bookTags.filter(t => {
+      return t.translates.ua.name.indexOf(this.value.trim()) !== -1
+    });
+
+    var html = ``;
+    tagsFilter.forEach(t => {
+      html += `<div class="addTags__searchResult" data-id="${t.id}">${t.translates.ua.name}</div>`;
+    });
+    searchResultCont.append(html);
+    searchResultCont.addClass('show');
+  }
+
+  searchResultCont.click(function(e){
+    if(e.target.classList.contains('addTags__searchResult')){
+      currentTags.append(`
+        <div class="tag" data-id="${e.target.getAttribute('data-id')}">
+            ${e.target.innerHTML}
+            <input hidden name="tags[]" value="${e.target.getAttribute('data-id')}">
+            <span class="tag-remove" data-id="${e.target.getAttribute('data-id')}">×</span>
+        </div>
+      `);
+      searchResultCont.html('');
+      $('#add_tag')[0].value = '';
+      $('#add_tag')[0].focus();
+    }
+
+  });
+
+  $('.currentTags').click(function(e){
+    if(e.target.classList.contains('tag-remove')){
+      $(`.tag[data-id="${e.target.getAttribute('data-id')}"]`).remove();
+    }
+  });
+}
 
 function getCurrentDateFormatted() {
   // 1. Создаем новый объект Date, содержащий текущую дату и время

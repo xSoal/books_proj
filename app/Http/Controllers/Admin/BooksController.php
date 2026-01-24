@@ -8,6 +8,7 @@ use App\Models\BookTranslate;
 use App\Models\Characteristic;
 use App\Models\CharacteristicTranslate;
 use App\Models\CharacteristicValue;
+use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -103,6 +104,24 @@ class BooksController extends Controller
             DB::table('books_char_val')->insert($dataToInsert);
 
 
+
+
+            DB::table('books_tags')->where('book_id', $input['id'])->delete();
+            $dataToInsert = [];
+            $book_tags = array_unique($input['tags']);
+
+            foreach ($book_tags as $tag_id) {
+                $dataToInsert[] = [
+                    'book_id'     => $book->id,
+                    'tag_id' => $tag_id,
+                    'created_at'  => now(),
+                    'updated_at'  => now(),
+                ];
+            }
+
+            DB::table('books_tags')->insert($dataToInsert);
+
+
             if( $book_save ){
                 if( isset($input['save_and_exit']) ){
 				    return redirect()->route('admin.books')->with('status','Додано');
@@ -146,6 +165,7 @@ class BooksController extends Controller
             }
             
 
+            
             DB::table('books_char_val')->where('book_id', $input['id'])->delete();
             $dataToInsert = [];
             $book_char_vals = array_unique($input['book_chars_vals']);
@@ -160,6 +180,25 @@ class BooksController extends Controller
             }
 
             DB::table('books_char_val')->insert($dataToInsert);
+
+
+
+
+            
+            DB::table('books_tags')->where('book_id', $input['id'])->delete();
+            $dataToInsert = [];
+            $book_tags = array_unique($input['tags']);
+
+            foreach ($book_tags as $tag_id) {
+                $dataToInsert[] = [
+                    'book_id'     => $input['id'],
+                    'tag_id' => $tag_id,
+                    'created_at'  => now(),
+                    'updated_at'  => now(),
+                ];
+            }
+
+            DB::table('books_tags')->insert($dataToInsert);
 
 
 
@@ -237,13 +276,29 @@ class BooksController extends Controller
 
             $book_chars_vals = DB::table('books_char_val')->where('book_id', $id)->get();
 
+            $tags = Tag::where('active', 1)->get();
+            $tags->transform(function ($tag) {
+                $tag->setRelation('translates', $tag->translates->keyBy('lang'));
+                return $tag;
+            });
+
+            $current_tags = $item->tags;
+            $current_tags->transform(function ($tag) {
+                $tag->setRelation('translates', $tag->translates->keyBy('lang'));
+                return $tag;
+            });
+
+
             $data = [
 					'title' => 'Редагувати книгу',
 					'item' => $item,
                     'characteristics' => json_encode($characteristics),
                     'chars_vals' => json_encode($chars_vals),
-                    'book_chars_vals' => $book_chars_vals
+                    'book_chars_vals' => $book_chars_vals,
+                    'tags' => $tags,
+                    'current_tags' => $current_tags
 			];
+
 			return 	view('admin.books.edit',$data);
 		}
         abort(404);
@@ -262,11 +317,20 @@ class BooksController extends Controller
                 return $char_val;
             });
 
+
+            $tags = Tag::where('active', 1)->get();
+            $tags->transform(function ($tag) {
+                $tag->setRelation('translates', $tag->translates->keyBy('lang'));
+                return $tag;
+            });
+
             $data = [
                 'title' => 'Додати книгу',
                 'characteristics' => json_encode($characteristics),
-                'chars_vals' => json_encode($chars_vals)
+                'chars_vals' => json_encode($chars_vals),
+                'tags' => json_encode($tags)
             ];
+
 			return 	view('admin.books.edit',$data);
 		}
 		abort(404);

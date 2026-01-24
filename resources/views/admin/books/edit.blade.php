@@ -3,7 +3,7 @@
 
 @section('content')
 
-<section class="add_user edit_user main_section active">
+<section class="add_user edit_user main_section active bookPage">
     <div class="title_h1">
         <div class="top_block">
             <a href="{{ route('admin.books') }}" class="back_to">Назад</a>
@@ -13,15 +13,16 @@
     
     <div class="form_block_items form_add form_edit">
 
-
+        
         <script id="characteristics" type="application/json">{!! $characteristics !!}</script>
         <script id="chars_vals" type="application/json">{!! $chars_vals !!}</script>
+        <script id="tags" type="application/json">{!! $tags !!}</script>
         
-        
-        @isset($item)
-        <script id="book_chars_vals" type="application/json">{!! $book_chars_vals !!}</script>
-        @endisset
 
+        @isset($item)
+            <script id="book_chars_vals" type="application/json">{!! $book_chars_vals !!}</script>
+            <script id="current_tags" type="application/json">{!! $current_tags !!}</script>
+        @endisset
 
 
         <?php
@@ -49,8 +50,10 @@
             <input type="hidden" name="id" value="{{$item->id ?? 0}}">
             <input type="hidden" name="languages" value={{ json_encode($languages) }} >
             
+            <h2>Характеристики </h2>
             <div class="bookCharsSection">
                 @isset($item)
+                <h3>Характеристики книги </h3>
                 <div class="book__charsCont">
                     @foreach ($book_chars_vals as $book_chars_val)
                     <?php
@@ -114,11 +117,35 @@
                     Додати характеристику
                 </button>
             </div>
-
+            <br>
             <div class="tagsCont">
-
+                <h2>Поточні вибрані теги: </h2>
+                <div class="currentTags">
+                    @foreach ($current_tags as $tag)
+                        <div class="tag" data-id="{{ $tag['id'] }}">
+                            {{ $tag['translates']['ua']['name'] }}
+                            <input hidden name="tags[]" value="{{ $tag['id'] }}}">
+                            <span class="tag-remove" data-id="{{ $tag['id'] }}">×</span>
+                        </div>
+                    @endforeach
+                </div>
+                <div class="addTagsCont">
+                    <div class="form_block">
+                        <div class="fb_inside">
+                            <div class="fb_input_inside">
+                                <input id="add_tag" type="text" value="" placeholder="Почніть вводити тег...">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="addTags__searchResultCont">
+                        <div class="addTags__searchResult" data-id="1">Тест тег</div>
+                        <div class="addTags__searchResult" data-id="2">Тест тег 2</div>
+                        <div class="addTags__searchResult" data-id="3">Тест тег 3</div>
+                    </div>
+                </div>
             </div>
-            
+            <br><br><br>
             <div class="langsForm">
                 <div class="langsForm__headerCont">
                     @for ($i =0 ; $i < count($languages); $i++)

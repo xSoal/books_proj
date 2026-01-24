@@ -5663,6 +5663,132 @@ body {
 
 
 
+.tagsCont {
+  font-family: Arial, sans-serif;
+  width: 100%;
+  max-width: 500px;
+}
+
+.tagsCont h2 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+/* Контейнер для выбранных тегов */
+.currentTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+/* Оформление самого тега */
+/* Контейнер тегов */
+.currentTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px; /* Расстояние между тегами */
+  margin-bottom: 12px;
+}
+
+/* Сам тег */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  background-color: #f0f2f5; /* Нейтральный светло-серый */
+  border: 1px solid #dcdfe6;
+  border-radius: 6px; /* Мягкое скругление под стать инпуту */
+  padding: 4px 10px;
+  font-size: 14px;
+  color: #606266;
+  transition: all 0.2s ease;
+}
+
+.tag:hover {
+  border-color: #c0c4cc;
+  background-color: #e9ebf0;
+}
+
+/* Текст внутри тега */
+.tag-text {
+  line-height: 1;
+}
+
+/* Кнопка удаления */
+.tag-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #909399;
+  color: #fff;
+  font-size: 12px;
+  cursor: pointer;
+  line-height: 1;
+  transition: background-color 0.2s;
+}
+
+.tag-remove:hover {
+  background-color: #f56c6c; /* Красный при наведении */
+}
+
+/* Обновленный стиль инпута для гармонии */
+#add_tag {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #dcdfe6;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+#add_tag:focus {
+  border-color: #409eff; /* Голубой акцент при фокусе */
+}
+
+/* Контейнер ввода и результатов */
+.addTagsCont {
+  position: relative;
+}
+
+#add_tag {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box; /* Чтобы padding не раздувал ширину */
+}
+
+/* Выпадающий список */
+.addTags__searchResultCont {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-top: none;
+  z-index: 100;
+  display: none; 
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.addTags__searchResultCont.show {
+  display: block;
+}
+
+.addTags__searchResult {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.addTags__searchResult:hover {
+  background-color: #f0f0f0;
+}
 
 
 
