@@ -21,7 +21,7 @@
 </head> 
 <body class="body_admin">
     <div class="preload_item"></div>
-	<header>
+	<header class="headerCont">
 		@if( count($errors) > 0 )
 			<div class="error">
 				<ul>
