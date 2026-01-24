@@ -90,6 +90,7 @@
                                     @endforeach
                                 </select>
                             </div>
+                            <div class="bookCharDel"><i class="fa-regular fa-trash-can"></i></div>
                         </div>
                     @endforeach
                     {{-- <div class="book__char">
@@ -139,9 +140,6 @@
                     </div>
                     
                     <div class="addTags__searchResultCont">
-                        <div class="addTags__searchResult" data-id="1">Тест тег</div>
-                        <div class="addTags__searchResult" data-id="2">Тест тег 2</div>
-                        <div class="addTags__searchResult" data-id="3">Тест тег 3</div>
                     </div>
                 </div>
             </div>

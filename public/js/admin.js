@@ -12,6 +12,7 @@ var bookCharTemplate = `
         !!!option_char_val!!!
       </select>
   </div>
+  <div class="bookCharDel">del</div>
 </div>
 `;
 
@@ -1296,6 +1297,12 @@ function reinitBookSelects(){
       $(select).closest('.book__char').find('.book__charVal__select').html(charValsOpetionsHTML)
     }
   })
+
+  $('.bookCharDel').toArray().forEach(d => {
+    d.onclick = () => {
+      $(d).closest('.book__char').remove();
+    }
+  });
 }
 
 
