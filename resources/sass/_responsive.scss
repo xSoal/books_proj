@@ -1,0 +1,1186 @@
+@media screen and (max-width: 1365px) {
+    .container{
+        padding: 0 20px;
+    }
+}
+
+@media screen and (max-width: 1200px){
+    .container_full{
+        padding: 0;
+    }
+
+    //header
+    .header_side {
+        &.left{
+            gap: 20px;
+        }
+
+        &.right{
+            justify-content: flex-end; 
+            gap: 20px;
+        }
+    }
+
+    //main-section-2
+    .complaints_cards{
+        &.antirating{
+            .swiper{
+                padding: 0 100px 0 20px;
+            }
+        }
+        
+    }
+    .side_last_complaints{
+        &.swiper{
+            padding: 0 100px 0 20px;
+        }
+    }
+
+    //main-section-9
+    .community_val {
+        font-size: 36px;
+    }
+
+    //judge-list
+  
+    .j_list_sidebar{
+        width: 100%;
+
+        .line{
+            display: none;
+        }
+    }
+
+    .j_list_sidebar_inner{
+        flex-direction: row;
+    }
+
+    .j_list_side_cards,
+    .j_list_side_complaints,
+    .j_list_side_antirating{
+        width: calc((100% - 32px) / 3);
+    }
+    
+}
+
+@media screen and (max-width: 1100px) {
+   
+    //header
+    .nav_list {
+        gap: 10px;
+        align-items: flex-start;
+    }
+
+    .auth_list{
+        gap: 8px;
+    }
+
+    //main section 1
+    .ssi_card{
+        span {
+            font-size: 18px;
+        }
+    }
+
+    //main-section-3
+    .section_info_wrap{
+        flex-wrap: wrap;
+    }
+
+    .section_info_column {
+        width: 100%;
+        gap: 20px;
+        order: 0;
+    
+        &.start{
+            width: calc((100% - 100px)/ 2);
+            column-gap: 0;
+            order: 1;
+        }
+    
+        &.end{
+            width: calc((100% - 100px)/ 2);
+            column-gap: 0;
+            order: 2;
+        }
+    
+    }
+
+    //main-section-5
+    .section_about_wrapper {
+        flex-wrap: wrap-reverse;
+        gap: 45px;
+    }
+
+    .section_about_side{
+        width: 100%;
+    }
+
+    .section_about_image{
+        justify-content: center;
+    }
+
+    //main-section-9
+    .heading_secondary {
+        font-size: 38px;
+    }
+
+    .community_val {
+        font-size: 32px;
+    }
+
+   //judge_content
+    .judge_content{
+        flex-wrap: wrap;
+    }
+
+    //judge_side_item
+    .side_item{
+        width: 100%;
+        .section_info{
+            display: flex;
+            width: 100%;
+            .section_info_wrap{
+                display: flex;
+            }
+            .container{
+                padding: 0;
+            }
+        }
+
+        .section_info_wrap{
+            display: none;
+        }
+    }
+
+    .side_last_complaints{
+        .last_complaints_list{
+            display: none;
+        }
+        .antirating_list{
+            display: none;
+        }
+        .complaints_cards{
+            display: flex;
+            &.swiper {
+                padding: 0 100px 0 0;
+            }
+
+            .antirating_card{
+                background-color: #fff;
+            }
+            
+            .antirating_card_row{
+                &.second{
+                    background-color: #fff;
+                }
+            }
+                
+        }
+    }
+
+    //complain page
+    .complaint_page_desc_wrap{
+        flex-wrap: wrap-reverse;
+        width: 100%;
+    }
+
+    //judge-list
+    .page_content_wrap{
+        flex-wrap: wrap;
+    }
+
+    .news_item {
+        width: 100%;
+    }
+
+    //footer
+    .footer_top{
+        flex-wrap: wrap;
+    }
+
+    .footer_col{
+        justify-content: center;
+        width: calc(100% / 4);
+        &:first-child{
+            width: 100%;
+            margin: 0 0 30px;
+        }
+    }
+
+    .loader{
+        max-width: 400px;
+    }
+}
+
+@media screen and (max-width: 1040px){
+    .header_button{
+        display: none;
+    }
+}
+
+@media screen and (max-width: 890px){
+    //main-section-1
+    .section_search__background{
+        padding: 0 0 16px;
+    }
+
+    .heading_main{
+        font-size: 40px;
+    }
+
+    .ssi_cards {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border: 1px solid #D2CFE7;
+        border-radius: 28px;
+    }
+    .ssi_card {
+        max-width: 100%;
+        padding: 20px;
+        border-radius: 0px;
+        border-top: 0px solid #D2CFE7;
+        border-left: 0px solid #D2CFE7;
+        border-right: 0px solid #D2CFE7;
+        border-bottom: 1px solid #D2CFE7;
+    
+    
+        &:first-child{
+            border-bottom: 1px solid #D2CFE7;
+            border-radius: 0px; 
+        }
+        &:last-child{
+            border: none; 
+            border-radius: 0px; 
+        }
+    
+        img{
+            position: relative;
+            top: 50%;
+            left: 0;
+        }
+    
+    }
+
+    .ssi_card_wrap{
+        max-width: 325px;
+    }
+
+    //main-section-2
+    .section_last_complaints{
+        padding: 70px 0;
+    }
+
+    .slc_wrapper,
+    .slc_wrapper_inner{
+        gap: 20px;
+    }
+
+    .heading_secondary{
+        font-size: 36px;
+    }
+
+    //main-section-3
+    .section_background_info {
+        padding: 50px 0;
+
+        .search_bg_item {
+            position: absolute;
+            top: initial;
+            left: initial;
+            bottom: -20%;
+            right: 20%;
+            width: 200%;
+            object-fit: contain;
+          }
+    }
+
+    .section_info_column {
+        img {
+            width: 100%;
+        }
+    }
+
+    //main-section-9
+    .sac_communities{
+        flex-wrap: wrap;
+    }
+
+    .comunity_link{
+        &:first-child,
+        &:nth-child(2){
+            width: calc((100% - 20px) / 2);
+        }
+
+        &:last-child{
+            width: 100%;
+        }
+    }
+    .community_val {
+        font-size: 28px;
+    }
+
+    //judge-list
+
+    .j_list_card{
+        min-width: 100%;
+    }
+
+    .j_list_card_wrap,
+    .j_list_card_info_bottom{
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .all_complaints{
+        width: 100%;
+    }
+
+    .j_list_card_info{
+        .complaint_page_judge_name_val{
+            align-items: flex-start;
+        }
+    } 
+
+    //judge list
+    .j_list_sidebar_inner{
+        flex-wrap: wrap;
+    }
+    .j_list_side_cards{
+        width: 100%;
+    }
+    .j_list_side_complaints,
+    .j_list_side_antirating{
+        width: calc((100% - 16px) / 2);
+    }
+
+
+
+    //footer
+    .footer_col{
+        width: calc((100% - 20px) / 2);
+        margin: 0 0 30px;
+
+        &:last-child{
+            width: 100%;
+        }
+
+        .nav_link{
+            font-size: 14px;
+        }
+    }
+
+    .footer_col_social{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .footer_col_title,
+    .social_list{
+        margin: 0;
+    }
+
+    .footer_button{
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 810px){
+    //judge list
+    .j_list_card_info{
+        display: flex;
+        width: 100%;
+    }
+    .j_list_card_img{
+        width: 100%;
+        align-items: flex-start;
+    }
+    .j_list_card_image{
+        width: 100%;
+        height: 320px;
+    }
+    .j_list_card_info{
+        .complaint_page_judge_name_val{
+            align-items: flex-start;
+        }
+    } 
+
+    .j_list_card_info_bottom{
+        width: 100%;
+    }
+    .all_complaints{
+        justify-content: center;
+    }
+}
+
+@media screen and (max-width: 768px){
+
+    //header
+    .header_auth,
+    .header_nav{
+        display: none;
+    }
+
+    .header_burger,
+    .mobile_nav.active {
+        display: flex;
+    }
+
+    .mobile_nav.active {
+        top: 88px;
+    }
+
+    //main section-1
+    .search_select_wrap{
+        flex-wrap: wrap;
+    }
+
+    .section_search_wrapper{
+        gap: 16px;
+        padding: 115px 0;
+    }
+
+    //complaint page 
+    .complaint_page_content{
+        .judge_complaints_list{
+            padding: 40px;
+        }
+
+        & .judge_complaints_title{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+    } 
+    .complaint_page_judge_heading,
+    .complaint_page_judge_naming,
+    .complaint_page_judge_name_val{
+        width: 100%;
+        min-width: 100%;
+    }
+}
+
+@media screen and (max-width: 740px) {
+    .popup_item{
+        left: 0;
+        bottom: 600%;
+        max-width: 100%;
+        transform: translate(0, 0);
+
+        &.active{
+            top: inherit;
+            left: 0;
+            bottom: 0;
+        }
+    }
+    .popup_body {
+        padding: 16px;
+        flex-wrap: wrap-reverse;
+        gap: 10px;
+    }
+    .popup_left {
+        max-width: 100%;
+        align-items: center;
+        padding: 8px 0px;
+        gap: 8px;
+    }
+    .popup_form{
+        width: 100%;
+    }
+    .popup_fields{
+        padding: 8px 0;
+    }
+    .popup_img {
+        width: 100%;
+        height: 200px;
+        gap: 12px;
+    }
+
+}
+@media screen and (max-width: 680px) {
+
+    .form_add{
+        & .form_block{
+            & .fb_inside{
+                display: block;
+            }
+        }
+    }
+
+    .page_content{
+        & .table {
+            display: block;
+            width: 100%;
+            overflow-x: scroll;
+
+            & .tbody,
+            & .thead {
+                width: 1200px;
+            }
+        }
+    }
+
+    .expert_card{
+        height: auto;
+    }
+
+    //header
+    .header {
+        padding: 10px 0px; 
+        z-index: 1000;
+    }
+    .header_logo {
+        width: 160px;
+        height: 45px;
+
+        img{
+            max-width: 100%;
+            max-height: 100%;
+        }
+    }
+
+    .mobile_nav.active {
+        top: 50px;
+    }
+
+    //main-section-1
+     .heading_main{
+        font-size: 36px;
+    }
+
+    .section_search_wrapper{
+        p{
+            font-size: 16px;
+        }
+    }
+
+    .search_field{
+        input{
+            padding: 15px 14px 14px;
+            height: 52px;
+            font-size: 14px;
+            &::placeholder{
+                font-size: 14px;
+            }
+        }
+    }
+
+    .search_button {
+        width: 48px;
+        height: 48px;
+    }
+
+    .search_frame_img{
+        span {
+            font-size: 14px;
+        }
+
+        img{
+            width: 15px;
+            height: 15px;
+        }
+    }
+
+    .search_select_block{
+        padding: 20px;
+    }
+
+    .current_select{
+        min-height: 40px;
+        span {
+            font-size: 14px;
+        }
+    }
+
+   
+
+    .ssi_card{
+        height: auto;
+        span{
+            font-size: 16px;
+        }
+    } 
+
+    //main-section-2
+
+    .heading_secondary{
+        font-size: 26px;
+    }
+
+    .slc_wrapper{
+        p{
+            font-size: 14px;
+        }
+    }
+
+    .section_last_complaints{
+        &::after{
+            display: none;
+        }
+    }
+ 
+    .arrow-next,
+    .arrow-prev{
+        display: none!important;
+    }
+
+    //main-section-3
+   
+    .section_info_number{
+        font-size: 52px;
+    }
+    .section_info_text{
+        font-size: 16px;
+    }
+
+    .section_info_column{
+        &.end,
+        &.start{
+            width: calc((100% - 48px) / 2);
+        }
+    }
+
+    //main-section-5
+    .sa_background {
+        padding: 50px 0;
+
+        .search_bg_item{
+            bottom: 50%;
+            right: -100%;
+            width: 800px;
+            height: 800px;
+        }
+    }
+
+    .section_about_text{
+        gap: 30px;
+        p{
+            font-size: 14px;
+        }
+    }
+
+    //section-6
+    .section_experts{
+        padding: 50px 0;
+    }
+
+    .sections_experts_wraper {
+    
+        .button_item{
+            &.bottom{
+                display: flex;
+            }
+        } 
+    }
+
+    .section_news_title{
+        .button_item {
+            display: none;
+        }
+    }
+
+    //section-7
+    .section_news{
+        padding: 50px 0;
+    }
+
+    .section_about{
+        &.form{
+            .section_about_image{
+                width: 80%;
+            }
+            .section_about_side{
+                align-items: center;
+                gap: 16px;
+
+                p{
+                    font-size: 14px;
+                    text-align: center;
+                }
+            }
+
+            .section_about_text{
+                align-items: center;
+                gap: 16px;
+            }
+        }
+    }
+
+    .form{
+        align-items: center;
+    }
+
+    .tel_link{
+        font-size: 32px;
+    }
+
+    //main-section-9
+    .sac_wrap{
+        padding: 50px 0;
+    }
+    .comunity_link{
+        &:first-child,
+        &:nth-child(2){
+            width: 100%;
+        }
+
+        &:last-child{
+            width: 100%;
+        }
+    }
+
+    //judge-page
+    //judge-card
+    .judge_card{
+        padding: 16px 16px 32px 16px; 
+        gap: 32px;
+    }
+
+    .judge_card_img{
+        align-items: center;
+        width: 100%;
+    }
+
+    .judge_card_img_item{
+        width: 100%;
+        height: 288px;
+    }
+
+    .judge_card_rating{
+        justify-content: flex-start;
+    }
+
+    .judge_card_img {
+        .button_item{
+            display: flex;
+            width: 100%;
+        }
+    }
+    .judge_card_footer_btns{
+        .button_item{
+            &:not(.button_item.ico){
+                display: none;
+            }
+        }
+    }
+
+    .judge_card_img_mob{
+        display: flex;
+
+        .judge_card_status,
+        .btn_bell{
+            display: flex;
+        }
+    }
+
+    .judge_card_status,
+    .btn_bell{
+        display: none;
+    }
+
+    .judge_card_name{
+        h2 {
+            font-size: 20px; 
+        }
+    }
+    .judge_card_info{
+        min-width: 100%;
+        gap: 32px;
+    }
+    .judge_card_list_item_wrap{
+        max-width: 100%;
+        width: calc((100% - 8px) / 2);
+    }
+
+    .judge_card_list_item_value{
+        width: calc((100% - 8px) / 2);
+    }
+
+    .judge_card_list_item_key, .judge_card_list_item_value{
+        font-size: 13px;
+        line-height: normal;
+    }
+
+    .judge_card_footer_btns{
+        justify-content: center;
+
+        .button_item{
+            width: 100%;
+        }
+    }
+
+
+    //judge_card
+
+    .judge_card {
+        margin: 40px 0 0;
+    }
+    
+    .judge_container{
+        gap: 16px;
+    }
+
+    .judge_complaints_list{
+        padding: 16px;
+        gap: 32px;
+    }
+
+    .judge_complaints_title {
+        h2{
+            font-size: 20px; 
+            line-height: 1; /* 100% */ 
+            gap: 8px;
+        }
+    }
+
+    .judge_content_list {
+        gap: 16px;
+
+        .line{
+            display: flex;
+        }
+    }
+
+    .number{
+        padding: 6px;
+        font-size: 16px;
+        line-height: 24px;
+        border-radius: 6px;
+    }
+
+    .judge_complaints_filter_tab{
+        .number{
+            height: 20px;
+            padding: 6px 4px;
+            border-radius: 4px;
+        }
+    }
+
+    .complaint_item{
+        gap: 16px; 
+    }
+
+    .complaint_item_content_title{
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .complaint_item_name{
+        font-size: 14px;
+        font-weight: 500;
+        color:#494949;
+    }
+    .complaint_item_date,
+    .complaint_item_content_text,
+    .complaint_item_button_more{
+        font-size: 13px;
+        font-weight: 400;
+    }
+
+    .complaint_item_content_status{
+        font-size: 11px;
+    }
+
+    .complaint_item_right{
+        .btn_bell{
+            display: flex;
+        }
+    }
+
+    .complaint_item_status_list{
+        gap: 6px 6px;
+    }
+
+    .complaint_item_status_ico{
+        width: 16px;
+        height: 28px;
+
+        &::after{
+            width: 12px;
+            height: 12px;
+        }
+    }
+
+    .complaint_item_status_item{
+        padding: 0 0 0 5px;
+        font-size: 9px;
+        font-weight: 400;
+    }
+    
+    .complaint_item_violations{
+        margin: 0 0 16px;
+        text-align: center;
+
+        .button_item {
+            margin: 16px 0 0 0;
+        }
+    }
+
+    //judge section
+    .complaint_item_content_inner{
+        min-width: 100%;
+    }
+
+    //complaint page
+    .complaint_page{
+        .btn_bell{
+            display: flex;
+        }
+    }
+
+    .complaint_page_judge_img{
+        width: 100%;
+        & .btn_xs{
+            display: flex;
+            position: absolute;
+            right: 50px;
+        }
+                                                                                                     
+    }
+
+    .complaint_page_judge_heading{
+        & .btn_xs{
+            display: none;
+        }
+                                                                                                     
+    }
+
+    .complaint_page_judge_wrap {
+        padding: 30px 20px;
+    }
+
+    .complaint_page_judge_name_val{
+        align-items: flex-start;
+    }
+
+    .complaint_page_judge_name_status {
+        font-size: 14px;
+    }
+
+    .complaint_page_judge_name{
+        h1 {
+            font-size: 24px;
+            text-align: left;
+        }
+    }
+
+    .complaint_page_judge_btns{
+        justify-content: center;
+        width: 100%;
+    }
+   
+    .complaint_page{
+        .complaint_page_item_swiper{
+            padding: 0;
+        }
+    } 
+    
+    .complaint_page_content{
+        .judge_complaints_list{
+            padding: 30px 20px;
+        }
+    } 
+
+    .complaint_item_table_list {
+        min-width: 100%;
+    }
+
+    .qa_item{
+        flex: 1 0 100%;
+    }
+
+    .complaint_page_item_author {
+        gap: 16px;
+        flex-wrap: wrap;
+        .complaint_item_subtitle{
+            font-size: 14px;
+        }
+        .complaint_item_name {
+            color: #494949;
+            font-size: 14px;
+        }
+        .complaint_item_date {
+            color: #000;
+            font-size: 12px;
+            opacity: 0.5;
+          }
+    }
+
+    .complaint_page_item_btns {
+        .button_item{
+            width: 100%;
+        }
+    }
+
+    .pagination_arrows {
+        gap: 8px;
+    }
+    .pagination_arrow{
+        padding: 8px;
+        span{
+            font-size: 12px;
+        }
+    }
+
+
+    .complaint_item_header{
+        &.all{
+            align-items: flex-end;
+
+            .complaint_item_headline {
+                flex-wrap: wrap;
+                justify-content:flex-start;
+                width: 100%;
+            }
+            .compalint_author_wrap{
+               width: 100%;
+            }
+            .complaint_item_name{
+                font-size: 18px;
+                line-height: 24px;
+                text-align: left;
+            }
+        }
+    }
+
+    .complaint_item_photo{
+        width: 100%;
+        height: 175px;
+        img{
+            object-fit: cover;
+        }
+    } 
+
+    //judge list
+
+    .j_list_card_wrap{
+        gap: 8px;
+    }
+
+    .j_list_card_info{
+        .complaint_page_judge_name_val{
+            gap: 5px;
+        }
+    } 
+
+    //judge list
+    .j_list_side_complaints,
+    .j_list_side_antirating{
+        width: 100%;
+    }
+
+    .news_item {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .news_item_img{
+        width: 100%;
+        height: 200px;
+    }
+
+    //news-item
+    .news_el{
+        padding: 16px 16px 24px;
+        border-radius: 16px;
+    }
+    .news_el_img{
+        height: 300px;
+    }
+
+
+    //footer
+    .footer_top{
+        padding: 0 0 30px;
+    }
+
+    .footer_col{
+        justify-content: flex-start;
+        &:first-child,
+        &:last-child{
+            justify-content: center;
+        }
+
+        &:nth-child(2){
+            width: 28%;
+        }
+
+        &:nth-child(3){
+            width: 62%;
+        }
+
+        .footer_nav_list{
+            gap: 16px;
+        }
+
+        .nav_link{
+            font-size: 14px;
+        }
+    }
+
+    .footer_bottom {
+        padding: 30px 0 0;
+    }
+
+    .loader {
+        max-width: 300px;
+      }
+}
+
+
+@media screen and (max-width: 480px) {
+    .side_last_complaints{
+        .last_complaints_list,
+        .antirating_list{
+            display: flex;
+            width: 100%;
+            .complaints_card,
+            .antirating_card{
+                width: 100% !important;
+            }
+        }
+
+        .antirating_list{
+            display: flex;
+        }
+
+        .complaints_cards{
+            display: none;
+        }
+
+        .antirating_cards{
+            display: flex;
+        }
+        .button_item.light {
+            margin: 20px 0 0 0;
+          }
+    }
+
+    .complaint_page_item_docs{
+        width: 100%;
+    }
+
+    .complaint_page_content{
+        .judge_complaints_list{
+            padding: 20px 10px;
+        }
+    } 
+
+    //judge-list
+    .j_list_card_image{
+        width: 100%;
+        height: 200px;
+    }
+
+      //news-item
+      .news_el_img{
+        height: 230px;
+    }
+}

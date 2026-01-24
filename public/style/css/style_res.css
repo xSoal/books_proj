@@ -1,0 +1,695 @@
+/* reset css */
+/* http://meyerweb.com/eric/tools/css/reset/
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+/* h1, h2, h3, h4, h5, h6,
+html, body, div, span, applet, object, iframe,
+p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+margin: 0;
+padding: 0;
+border: 0;
+font-size: 100%;
+font: inherit;
+vertical-align: baseline;
+}
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+display: block;
+}
+body {
+line-height: 1;
+}
+ol, ul {
+list-style: none;
+}
+blockquote, q {
+quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+content: '';
+content: none;
+}
+table {
+border-collapse: collapse;
+border-spacing: 0;
+} */
+/* reset css end */
+html {
+        scroll-behavior: smooth;
+    }
+body {
+    font-size: 14px;
+    line-height: 1.5;
+    background-color: #f5f5f5;
+    font-family: 'Open Sans', sans-serif;
+    margin: 0px;
+    color: #072446;
+}
+    
+* {
+    box-sizing: border-box;
+}
+    
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+a {
+    color: #157c57;
+    transition: color 400ms, background-color 400ms;
+}
+a:hover {
+    color: #157c57;
+}
+a,
+a:hover,
+a:focus,
+a:active {
+    text-decoration: none;
+}
+
+.container {
+max-width: 1320px;
+padding: 0px 15px;
+margin: auto;
+}
+
+
+.header {
+position: fixed;
+top: 0px;
+left: 0px;
+right: 0px;
+width: 100%;
+padding: 5px 0;
+background: #e9edf3;
+z-index: 5;
+height: 70px;
+}
+.headerInner {
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+.headerLogo {
+    max-width: 180px;
+    max-height: 100px;
+}
+.headerLogo img {
+max-width: 100%;
+max-height: 100px;
+width: auto;
+margin: auto;
+}
+.headerMenu a {
+display: flex;
+align-items: center;
+text-decoration: none;
+font-weight: 600;
+color: #072446;
+}
+.headerMenu {
+display: flex;
+}
+.headerMenuLinks {
+display: flex;
+}
+.headerMenuLinks li {
+margin: 0 25px;
+}
+.loginHref {
+margin-left: 25px;
+font-size: 18px;
+}
+
+.headerMenuLinks.loginHref {
+font-size: 14px;
+margin-left: 0;
+padding: 0;
+}
+.headerMenuLinks.loginHref .headerSubmenu{
+right: 0;
+left: unset;
+}
+.headerMenuLinks.loginHref a {
+}
+.headerMenu a:hover,
+.headerMenuLinks.loginHref a:hover {
+color: #157c57;
+}
+.loginHref img {
+max-width: 100%;
+width: 20px;
+height: 20px;
+}
+.paddingHeader {
+padding-top: 80px;
+}
+.headerMenu li {
+list-style: none;
+}
+.headerSubmenuCont {
+position: relative;
+}
+.headerSubmenu {
+width: max-content;
+display: none;
+position: absolute;
+left: 0;
+opacity: 0.8;
+padding: 25px 35px;
+animation: spFadeInUp 400ms ease-in;
+background: #000000;
+}
+.headerSubmenuCont:hover .headerSubmenu {
+display: block;
+padding: 15px 20px;
+}
+.headerSubmenu a {
+color: white;
+}
+.headerSubmenu a:not(:first-child) {
+margin-top: 15px;
+}
+@keyframes spFadeInUp {
+0% {
+opacity: 0;
+transform: translateY(20px);
+}
+100% {
+opacity: 1;
+transform: translateY(0);
+}
+}
+nav[role] .hidden {
+display: flex !important;
+}
+
+/* nav[aria-label="Pagination Navigation"] div:nth-child(1) {
+    display: none;
+}
+nav[aria-label="Pagination Navigation"] div:nth-child(2) div:nth-child(2) {
+    width: 100%;
+}
+nav[aria-label="Pagination Navigation"] div:nth-child(2) div:nth-child(2) span svg {
+    width: 45px;
+    fill: #777;
+}
+nav[aria-label="Pagination Navigation"] div:nth-child(2) div:nth-child(2) span {
+    display: flex;
+    align-items: center;
+}
+nav[aria-label="Pagination Navigation"] div:nth-child(2) div:nth-child(2) span a {
+    display: block;
+}
+    */
+nav[aria-label='Pagination Navigation'] div:nth-child(1) {
+display: none;
+}
+nav[aria-label='Pagination Navigation'] {
+display: flex;
+justify-content: center;
+align-items: center;
+margin: 100px auto;
+}
+nav[aria-label='Pagination Navigation'] .hidden {
+/* display: none !important; */
+}
+nav[aria-label='Pagination Navigation'] ul {
+display: flex;
+gap: 10px;
+align-items: center;
+list-style: none;
+padding: 0;
+}
+nav[aria-label='Pagination Navigation'] li {
+display: flex;
+align-items: center;
+}
+nav[aria-label='Pagination Navigation'] a,
+nav[aria-label='Pagination Navigation'] span {
+color: #888;
+font-size: 32px;
+text-decoration: none;
+padding: 4px 8px;
+border-radius: 4px;
+transition: color 0.2s;
+}
+nav[aria-label='Pagination Navigation'] span span span {
+padding: 0px;
+}
+nav[aria-label='Pagination Navigation'] span[aria-current='page'] span {
+color: #1b7f61; /* зелёный цвет активного номера */
+font-weight: 600;
+}
+nav[aria-label='Pagination Navigation'] a:hover {
+color: #1b7f61;
+}
+nav[aria-label='Pagination Navigation'] svg {
+width: 25px;
+height: 25px;
+stroke: #888;
+transition: stroke 0.2s;
+}
+nav[aria-label='Pagination Navigation'] a:hover svg {
+stroke: #1b7f61;
+}
+
+.contacts {
+background: #f4f7fb;
+}
+.contact-section {
+padding: 80px 0;
+font-family: 'Inter', sans-serif;
+}
+.contact-container {
+max-width: 1320px;
+margin: 0 auto;
+padding: 0 20px;
+display: flex;
+justify-content: space-between;
+gap: 60px;
+}
+/* Левая колонка */
+.contact-left {
+flex: 0 0 35%;
+}
+.contact-block {
+margin-bottom: 40px;
+}
+.contact-block h3 {
+font-size: 26px;
+font-weight: 700;
+color: #0d2340;
+margin-bottom: 10px;
+}
+.contact-block p {
+font-size: 17px;
+line-height: 1.5;
+color: #405264;
+}
+.socials {
+display: flex;
+gap: 15px;
+}
+.socials img {
+width: 32px;
+height: 32px;
+}
+/* Правая колонка */
+.contact-right {
+flex: 0 0 60%;
+}
+.contact-title {
+font-size: 42px;
+font-weight: 800;
+color: #0d2340;
+margin-bottom: 15px;
+}
+.contact-subtitle {
+font-size: 17px;
+line-height: 1.6;
+color: #405264;
+margin-bottom: 35px;
+max-width: 600px;
+}
+/* Форма */
+.contact-form input,
+.contact-form textarea {
+width: 95%;
+background: #ececec;
+border: none;
+padding: 18px 20px;
+font-size: 16px;
+margin-bottom: 18px;
+border-radius: 6px;
+outline: none;
+}
+.form-row {
+display: flex;
+gap: 20px;
+}
+.contact-form textarea {
+height: 160px;
+resize: none;
+}
+.contact-btn {
+background: #0d7845;
+color: white;
+padding: 14px 40px;
+font-size: 20px;
+line-height: 30px;
+font-weight: 500;
+border: none;
+border-radius: 6px;
+cursor: pointer;
+transition: 0.2s;
+}
+.contact-btn:hover {
+background: #0a6639;
+}
+.hidden {
+display: none;
+}
+.login-form {
+background: white;
+padding: 30px 40px;
+border-radius: 10px;
+box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+width: 380px; 
+}
+.form-group {
+margin-bottom: 20px;
+}
+label {
+display: block;
+font-weight: bold;
+margin-bottom: 5px;
+color: #333;
+}
+.form-control {
+width: 100%;
+padding: 10px 15px;
+border: 1px solid #ccc;
+border-radius: 5px;
+box-sizing: border-box; /* Важливо для width: 100% */
+transition: border-color 0.3s;
+}
+/* Стиль для інпуту з помилкою (як у полі "Логін") */
+.error-input {
+border: 2px solid #a00; /* Червона обведення */
+border-radius: 20px; /* Більш скруглені кути для Логіна */
+}
+.validation-error {
+color: #a00;
+font-size: 0.9em;
+margin-bottom: 5px;
+}
+/* ------------------ ПОЛЕ ПАРОЛЯ (КОМПЛЕКСНИЙ ІНПУТ) ------------------ */
+.password-container {
+display: flex;
+border: 2px solid #ccc;
+border-radius: 5px; /* Менші скруглення, ніж у Логіна */
+overflow: hidden;
+/* Червона обведення для поля пароля на скріншоті */
+border: 1px solid #ccc;
+}
+.password-icon-wrapper {
+background-color: #f8f8f8;
+color: #444;
+padding: 10px 12px;
+border-right: 2px solid transparent;
+display: flex;
+align-items: center;
+justify-content: center;
+min-width: 40px;
+}
+.password-input {
+flex-grow: 1;
+border: none; /* Видаляємо рамку всередині контейнера */
+padding: 10px;
+font-size: 16px;
+outline: none;
+border-radius: 0; /* Прибираємо скруглення тут */
+}
+.toggle-password {
+background-color: #28a745; /* Зелений колір кнопки */
+color: white;
+border: none;
+padding: 10px 15px;
+cursor: pointer;
+font-size: 16px;
+transition: background-color 0.2s;
+}
+.toggle-password:hover {
+background-color: #218838;
+}
+/* ------------------ ЧЕКБОКС ------------------ */
+.checkbox-group {
+display: flex;
+align-items: center;
+margin-top: -10px; /* Підтягуємо вище */
+}
+.checkbox-group input[type='checkbox'] {
+margin-right: 8px;
+width: 16px;
+height: 16px;
+}
+/* ------------------ КНОПКА SUBMIT ------------------ */
+.btn-submit {
+width: 100%;
+background-color: #28a745; /* Зелений колір */
+color: white;
+padding: 12px;
+border: none;
+border-radius: 5px;
+font-size: 18px;
+cursor: pointer;
+margin-top: 20px;
+transition: background-color 0.2s;
+}
+.btn-submit:hover {
+background-color: #218838;
+}
+.loginCont {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: url('/images/bg-pattern.svg');
+    background-size: cover;
+    padding: 100px 0;
+    background-color: #157c57;
+    }
+/* login form end */
+
+
+
+/* мобильное меню */
+
+/* --- Общие стили и Десктоп (База) --- */
+.mobHeader {
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.mobHeader__wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.siteLogo {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #333;
+    text-decoration: none;
+    z-index: 100;
+}
+.loginLinkBtn {
+    padding: 10px 15px;
+    background-color: #007bff; 
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    white-space: nowrap;
+}
+
+/* Скрываем гамбургер на десктопе */
+.navToggleBtn {
+    display: none; 
+}
+
+/* Десктопное меню */
+.mobileNavOverlay {
+    display: flex; 
+    align-items: center;
+    position: static; /* На десктопе не оверлей */
+    width: auto;
+    height: auto;
+    background: none;
+    padding: 0;
+}
+.menuList {
+    display: flex; /* Горизонтальный список */
+    list-style: none;
+    padding: 0;
+    margin: 0 20px 0 0;
+    gap: 15px;
+}
+.listItem a {
+    text-decoration: none;
+    color: #333;
+    padding: 5px;
+}
+
+.mobHeader  {
+    background: #e9edf3;
+    display: none;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    width: 100%;
+    padding: 5px 0;
+    background: #e9edf3;
+    z-index: 5;
+    height: 100px;
+}
+
+.mobHeader * {
+    list-style: none;
+}
+
+.mobHeader .headerSubmenu a {
+    display: block;
+}
+
+.mobHeader a {
+    color: #072446;
+
+}
+
+.mobHeader .headerMenuLinks a {
+    color: white;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ------------------------------------------- */
+/* --- Мобильные стили (Активация при < 800px) --- */
+/* ------------------------------------------- */
+@media (max-width: 799px) { 
+
+    .mobHeader {
+        display: block;
+    }
+
+    .header {
+        display: none;
+    }
+    
+    .navToggleBtn {
+        /* Показываем кнопку-гамбургер */
+        display: flex; 
+        flex-direction: column;
+        justify-content: space-around;
+        width: 30px;
+        height: 25px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        z-index: 100;
+    }
+    .navToggleBtn .btnLine {
+        width: 100%;
+        height: 3px;
+        background-color: #333;
+    }
+
+    .mobileNavOverlay {
+        /* Изначально скрыто */
+        display: none; 
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.98); 
+        z-index: 90;
+        padding-top: 100px; 
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    /* !!! Кастомный класс для открытого меню !!! */
+    .mobileNavOverlay.headerMoblie { 
+        display: flex; 
+    }
+
+    .menuList {
+        /* Вертикальный список */
+        flex-direction: column;
+        text-align: center;
+        margin: 0;
+        padding-bottom: 30px; 
+        border-bottom: 1px solid #eee;
+    }
+    .listItem {
+        margin: 15px 0;
+    }
+    .listItem a {
+        font-size: 1.4em;
+    }
+    
+    .loginContainer {
+        margin-top: 30px;
+    }
+}
+
+
+
+
+

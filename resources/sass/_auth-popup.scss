@@ -1,0 +1,344 @@
+.popup_item {
+    position: fixed;
+    top: -300%;
+    left: 50%;
+    display: flex;
+    max-width:450px;
+    width: 100%;
+    height: auto;
+    border-radius: 16px;
+    
+    transform: translate(-50%, -50%);
+    transition: 1s ease;
+    overflow: hidden;
+    z-index: 1100;
+
+    &.registration{
+        @media screen and (max-width: 480px) {
+            .popup_img{
+                display: none;
+            }
+        }
+    }
+
+    &.active{
+        top: 50%;
+    }
+}
+.popup_body {
+    display: flex;
+    background: #FFF;
+    justify-content: center;
+    align-items: center;
+    gap: 60px;
+    width: 100%;
+    max-width: 500px;
+    border-radius: 10px;
+}
+.popup_left {
+    display: flex;
+    max-width: 300px;
+    padding: 16px 0px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 16px;
+    flex: 1 0 0;
+    align-self: stretch;
+}
+.popaup_header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+}
+.popup_headline {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+.popup_form {
+    display: none;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+
+    &.active {
+        display: flex;
+    }
+}
+.popup_fields {
+    display: flex;
+    padding: 16px 0px 8px 0px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 8px;
+    align-self: stretch;
+}
+.popup_field_item {
+    display: flex;
+    
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 1px;
+    align-self: stretch;
+
+   &.password{
+    position: relative;
+   }
+
+    label {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        font-family: 'Manrope';
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal;
+        color: #9593A8;
+    }
+
+    input,
+    textarea,
+    .file,
+    .file_single{
+        display: flex;
+        width: 100%;
+        padding: 12px 16px;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 6px;
+        background: #F6F2F9;
+
+        color: #271B36;
+        font-family: 'Manrope';
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 24px;
+        border: 1px solid transparent;
+        outline: none;
+
+        &:focus{
+            transition: 0.4s ease;
+            border: 2px solid #DFC0FD;
+        }
+        
+    }
+    textarea{
+        resize: vertical;
+    }
+
+    .file,
+    .file_single{
+        position: relative;
+
+        &::before{
+            content: '';
+            width: 20px;
+            height: 20px;
+            background-image: url('/images/icons/plus.svg');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover;
+            cursor: pointer;
+        }
+
+        &::after{
+            content: attr(data-name);
+            position: absolute;
+            left: 50px;
+            font-size: 12px;
+        }
+    }
+
+    .file [type="file"],
+    .file_single [type="file"]{
+        opacity: 0;
+        width: 1px;
+        height: 1px;
+    }
+}
+.popup_button {
+    display: flex;
+    height: 48px;
+    padding: 8px 24px;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    align-self: stretch;
+    border-radius: 6px;
+    background: #DFC0FD;
+    border: 1px solid #DFC0FD;
+    
+    cursor: pointer;
+    transition: 0.4s ease;
+    &:hover{
+        background: #fff;
+    }
+
+    span{
+        font-family: 'Manrope';
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: normal;
+        color: #271B36;
+    }
+}
+
+.popup_bottom{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+}
+
+.popup_uath_icons{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+
+    &.hide{
+        display: none;
+    }
+}
+.popup_auth_btn{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30px;
+    border: 1px solid transparent;
+    transition: 0.4s ease;
+    cursor: pointer;
+
+    &:hover{
+        border: 1px solid #DFC0FD;
+        border-radius: 4px;
+    }
+    img{
+        max-width: 100%;
+    }
+}
+.bottom_btns {
+    font-family: 'Manrope';
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    color: #9593A8;
+    transition: 0.4s ease;
+    cursor: pointer;
+
+    &:hover{
+        text-decoration: underline;
+    }
+}
+.popup_img {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+.popup_img_item{
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+
+    img{
+        max-width: 100%;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: left;
+    }
+}
+.popup_img_text {
+    position: absolute;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    span{
+        color: #FFF;
+        font-family: 'Geologica';
+        font-size: 18px;
+        font-style: normal;
+        font-weight: 300;
+        line-height: normal;
+    }
+}
+.popup_item_close_btn {
+    position: absolute;
+    right: 18px;
+    top: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: #F6F2F9;
+    cursor: pointer;
+}
+
+.popup_bg,
+.search_bg,
+.search_bg_transparent {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(30, 14, 47, 0.72);
+    opacity: 0;
+    transition: 0.3s ease-in-out;
+    z-index: -1;
+
+    &.active {
+        opacity: 1;
+        z-index: 1050;
+    }
+}
+
+.search_bg{
+    &.active {
+        z-index: 700;
+    }
+}
+
+.search_bg_transparent{
+
+    background-color:#d6b7f43c;
+
+    &.active {
+        opacity: 1;
+        z-index: 100;
+    }
+}
+
+.pwd_show{
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    width: 24px;
+    height: 24px;
+    background-image: url(/images/icons/password-ico.svg);
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 100% 100%;
+    transform: translate(0, -8%);
+    cursor: pointer;
+}
