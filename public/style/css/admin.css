@@ -142,6 +142,14 @@ header {
   color: #fff;
 }
 
+.headerCont {
+  position: fixed;
+  top: 0px;
+  left: 0;
+  width: 100%;
+  z-index: 301;
+}
+
 .header_inner {
   position: fixed;
   top: 0px;
@@ -244,12 +252,17 @@ header {
   border-right: 1px solid rgba(214, 214, 214, 0.4);
   overflow-y: auto;
   position: fixed;
-  top: 41px;
+  top: 0;
   left: 0;
   background-color: #ffffff;
   z-index: 200;
   transition: all 0.5s ease-in-out;
 }
+
+.in_admin_menu {
+  padding-top: 41px;
+}
+
 .admin_menu.active {
   width: 300px;
   z-index: 200;
@@ -278,6 +291,11 @@ header {
 .admin_menu_section:hover {
   background-color: #1f3958;
 }
+
+.admin_menu_link:hover {
+  background-color: #1f3958;
+}
+
 
 .menu_title_item:hover {
   color: #ffffff;
@@ -588,7 +606,7 @@ body table.custom-table-requests td:first-child {
   font-size: 14px;
   line-height: 1.42;
   letter-spacing: 0.02em;
-  transform: translateX(-1px);
+  /* transform: translateX(-1px); */
 }
 .body_admin.preload {
   position: relative;
@@ -609,11 +627,11 @@ body table.custom-table-requests td:first-child {
 }
 
 .main_section {
-  padding: 0px 40px 40px 40px;
+  padding: 41px 40px 40px 40px;
   transition: all 0.5s ease-in-out;
 }
 .main_section.active {
-  padding: 0px 40px 40px 340px;
+  padding: 41px 40px 40px 340px;
 }
 
 .main_page_admin {
@@ -5935,12 +5953,12 @@ option {
     position: absolute;
     top: 7px;
     right: 15px;
-    z-index: 10;
+    z-index: 302;
   }
 
   .to_site {
     position: absolute;
     top: 7px;
     right: 125px;
-    z-index: 10;
+    z-index: 302;
   }
