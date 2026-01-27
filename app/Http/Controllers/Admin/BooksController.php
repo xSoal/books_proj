@@ -89,37 +89,42 @@ class BooksController extends Controller
                 $book_translate->save();
             }
 
-            $dataToInsert = [];
-            $book_char_vals = array_unique($input['book_chars_vals']);
-            
-            foreach ($book_char_vals as $char_val_id) {
-                $dataToInsert[] = [
-                    'book_id'     => $book->id,
-                    'char_val_id' => $char_val_id,
-                    'created_at'  => now(),
-                    'updated_at'  => now(),
-                ];
+            if(isset($input['book_chars_vals'])){
+                $dataToInsert = [];
+                $book_char_vals = array_unique($input['book_chars_vals']);
+                
+                foreach ($book_char_vals as $char_val_id) {
+                    $dataToInsert[] = [
+                        'book_id'     => $book->id,
+                        'char_val_id' => $char_val_id,
+                        'created_at'  => now(),
+                        'updated_at'  => now(),
+                    ];
+                }
+    
+                DB::table('books_char_val')->insert($dataToInsert);
             }
 
-            DB::table('books_char_val')->insert($dataToInsert);
 
 
 
-
-            DB::table('books_tags')->where('book_id', $input['id'])->delete();
-            $dataToInsert = [];
-            $book_tags = array_unique($input['tags']);
-
-            foreach ($book_tags as $tag_id) {
-                $dataToInsert[] = [
-                    'book_id'     => $book->id,
-                    'tag_id' => $tag_id,
-                    'created_at'  => now(),
-                    'updated_at'  => now(),
-                ];
+            if(isset($input['tags'])){
+                DB::table('books_tags')->where('book_id', $input['id'])->delete();
+                $dataToInsert = [];
+                $book_tags = array_unique($input['tags']);
+    
+                foreach ($book_tags as $tag_id) {
+                    $dataToInsert[] = [
+                        'book_id'     => $book->id,
+                        'tag_id' => $tag_id,
+                        'created_at'  => now(),
+                        'updated_at'  => now(),
+                    ];
+                }
+    
+                DB::table('books_tags')->insert($dataToInsert);
             }
 
-            DB::table('books_tags')->insert($dataToInsert);
 
 
             if( $book_save ){

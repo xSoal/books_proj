@@ -32,9 +32,7 @@
             
             <input type="hidden" name="languages" value={{ json_encode($languages) }} >
             
-            @foreach($parents as $characteristic)
-                <p>{{ $characteristic['translates']['ua']['name'] }}</p>
-            @endforeach
+
             <div class="form_block">    
                 <div class="fb_inside">
                     <div class="fb_label">

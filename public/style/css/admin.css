@@ -5525,7 +5525,7 @@ body {
   border-radius: 10px 10px 0 0; /* Округлые края как на скриншоте */
   cursor: pointer;
   transition: all 0.3s ease;
-  text-transform: lowercase; /* Стиль main_page, search */
+  /* text-transform: lowercase; */
   position: relative;
   bottom: -1px; /* Чтобы перекрывать нижнюю границу контейнера */
 }

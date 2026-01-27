@@ -12,7 +12,7 @@ var bookCharTemplate = `
         !!!option_char_val!!!
       </select>
   </div>
-  <div class="bookCharDel">del</div>
+  <div class="bookCharDel"><i class="fa-regular fa-trash-can"></i></div>
 </div>
 `;
 
@@ -1249,7 +1249,6 @@ function bookInit(){
 
 function bookAddCreate(){
   if(!$('#characteristics')[0]) return;
-
   var charsOptionsHTML = ``;
   bookChars.forEach(c => {
     charsOptionsHTML += `<option value="${c.id}">${c.translates.ua.name}</option>`
@@ -1267,6 +1266,8 @@ function bookAddCreate(){
 
   $('.book__addCharCont').click(function(){
     $('.book__charsCont').append(bookCharTemplate);
+    console.log($('.book__charsCont'));
+    
     var e = $('.book__charsCont .book__char:last-child');
     e.find('.book__charMain__select').html(charsOptionsHTML);
     e.find('.book__charVal__select').html(charValsOpetionsHTML);
