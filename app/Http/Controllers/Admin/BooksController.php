@@ -89,9 +89,11 @@ class BooksController extends Controller
                 $book_translate->save();
             }
 
+
             if(isset($input['book_chars_vals'])){
                 $dataToInsert = [];
                 $book_char_vals = array_unique($input['book_chars_vals']);
+                // dd($book->id);
                 
                 foreach ($book_char_vals as $char_val_id) {
                     $dataToInsert[] = [
@@ -101,8 +103,9 @@ class BooksController extends Controller
                         'updated_at'  => now(),
                     ];
                 }
-    
+                
                 DB::table('books_char_val')->insert($dataToInsert);
+
             }
 
 
@@ -170,40 +173,44 @@ class BooksController extends Controller
             }
             
 
-            
-            DB::table('books_char_val')->where('book_id', $input['id'])->delete();
-            $dataToInsert = [];
-            $book_char_vals = array_unique($input['book_chars_vals']);
-            
-            foreach ($book_char_vals as $char_val_id) {
-                $dataToInsert[] = [
-                    'book_id'     => $input['id'],
-                    'char_val_id' => $char_val_id,
-                    'created_at'  => now(),
-                    'updated_at'  => now(),
-                ];
+            if(isset($input['book_chars_vals'])){
+                DB::table('books_char_val')->where('book_id', $input['id'])->delete();
+                $dataToInsert = [];
+                $book_char_vals = array_unique($input['book_chars_vals']);
+                
+                foreach ($book_char_vals as $char_val_id) {
+                    $dataToInsert[] = [
+                        'book_id'     => $input['id'],
+                        'char_val_id' => $char_val_id,
+                        'created_at'  => now(),
+                        'updated_at'  => now(),
+                    ];
+                }
+    
+                DB::table('books_char_val')->insert($dataToInsert);
             }
 
-            DB::table('books_char_val')->insert($dataToInsert);
 
 
 
 
-            
-            DB::table('books_tags')->where('book_id', $input['id'])->delete();
-            $dataToInsert = [];
-            $book_tags = array_unique($input['tags']);
-
-            foreach ($book_tags as $tag_id) {
-                $dataToInsert[] = [
-                    'book_id'     => $input['id'],
-                    'tag_id' => $tag_id,
-                    'created_at'  => now(),
-                    'updated_at'  => now(),
-                ];
+            if(isset($input['tags'])){
+                DB::table('books_tags')->where('book_id', $input['id'])->delete();
+                $dataToInsert = [];
+                $book_tags = array_unique($input['tags']);
+    
+                foreach ($book_tags as $tag_id) {
+                    $dataToInsert[] = [
+                        'book_id'     => $input['id'],
+                        'tag_id' => $tag_id,
+                        'created_at'  => now(),
+                        'updated_at'  => now(),
+                    ];
+                }
+    
+                DB::table('books_tags')->insert($dataToInsert);
             }
 
-            DB::table('books_tags')->insert($dataToInsert);
 
 
 

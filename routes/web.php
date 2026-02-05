@@ -100,6 +100,11 @@ Route::group(['prefix' => '/admin', 'middleware' => 'auth'], function() {
         Route::post('/', ['uses' => '\App\Http\Controllers\Admin\TranslatesController@post', 'as' => 'admin.postTranslate']);
     });
 
+    Route::group(['prefix' => 'import'], function () {
+        Route::get('/', ['uses' => '\App\Http\Controllers\Admin\ImportController@index', 'as' => 'admin.import']);
+        Route::post('/importAdd', ['uses' => '\App\Http\Controllers\Admin\ImportController@add', 'as' => 'admin.importAdd']);
+    });
+
 
     Route::group(['prefix' => 'settings'], function () {
         Route::get('/', ['uses' => '\App\Http\Controllers\Admin\SettingsController@index', 'as' => 'admin.settings']);
@@ -119,6 +124,7 @@ Route::group(['prefix' => App\Http\Middleware\LocaleMiddleware::getLocale(), 'mi
     Auth::routes();
     
     Route::get('/', ['uses' => '\App\Http\Controllers\MainPage\MainPageController@index', 'as' => 'main_page']);
+    Route::get('/search', ['uses' => '\App\Http\Controllers\MainPage\SearchController@index', 'as' => 'search']);
 
 });
 

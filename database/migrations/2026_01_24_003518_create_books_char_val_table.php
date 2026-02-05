@@ -17,7 +17,7 @@ return new class extends Migration
                 ->constrained('books')
                 ->onDelete('cascade');
             $table->foreignId('char_val_id')
-                ->constrained('books')
+                ->constrained('char_vals')
                 ->onDelete('cascade');
             $table->timestamps();
         });

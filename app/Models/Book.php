@@ -14,7 +14,7 @@ class Book extends Model
     protected $fillable = [
         'img',
         'sort',
-        'active'
+        'active',
     ];
 
     public function translates(){

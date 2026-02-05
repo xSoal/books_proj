@@ -41,6 +41,14 @@
         </div>
 
     </div>
+    <?php
+        // foreach($items as  $k => $item){
+        //     echo '<pre>';
+        //     var_dump($item);
+        //     echo '</pre>';
+        // }
+        // dd('qwe');
+    ?>
     <div class="table">
         <div class="thead">
             <div class="tr tr_heading">

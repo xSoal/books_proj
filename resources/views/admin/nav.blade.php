@@ -29,6 +29,10 @@
         </div>
 
         <div class="admin_menu_link">
+            <a href="{{ route('admin.import') }}" class="menu_link_item users_list">Імпорт</a>
+        </div>
+
+        <div class="admin_menu_link">
             <a href="{{ route('admin.partners') }}" class="menu_link_item users_list">Партнери</a>
         </div>
 

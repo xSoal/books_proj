@@ -18,55 +18,59 @@ use Illuminate\Support\Facades\DB;
 class SearchController extends Controller
 {
     public function index(Request $request){
-        $search = trim($request->input('search'));
-        $perPage = 9;
+        // $search = trim($request->input('search'));
+        // $perPage = 9;
 
-        $titles = DB::table('settings')
-            ->where('type', 'titles')
-            ->first()->value;
-        $title = json_decode($titles)->search;
+        // $titles = DB::table('settings')
+        //     ->where('type', 'titles')
+        //     ->first()->value;
+        // $title = json_decode($titles)->search;
         
 
 
-        if(!$search){
-            // Создание пустого пагинатора, без запроса к БД
-            $resultSearch = new LengthAwarePaginator(
-                new Collection(), 
-                0,
-                $perPage,
-                LengthAwarePaginator::resolveCurrentPage(),
-                ['path' => $request->url(), 'query' => $request->query()]
-            );
+        // if(!$search){
+        //     // Создание пустого пагинатора, без запроса к БД
+        //     $resultSearch = new LengthAwarePaginator(
+        //         new Collection(), 
+        //         0,
+        //         $perPage,
+        //         LengthAwarePaginator::resolveCurrentPage(),
+        //         ['path' => $request->url(), 'query' => $request->query()]
+        //     );
 
-        } else {
+        // } else {
 
-            $searchPattern = '%' . $search . '%';
-            $today = Carbon::today();
+        //     $searchPattern = '%' . $search . '%';
+        //     $today = Carbon::today();
 
-            $query = News::whereDate('public_date', '<=', $today)
-                ->where('active', 1)
-                ->where(function ($q) use ($searchPattern) {
-                    $q->where('title', 'LIKE', $searchPattern) 
-                    ->orWhere('content', 'LIKE', $searchPattern);
-                });
+        //     $query = News::whereDate('public_date', '<=', $today)
+        //         ->where('active', 1)
+        //         ->where(function ($q) use ($searchPattern) {
+        //             $q->where('title', 'LIKE', $searchPattern) 
+        //             ->orWhere('content', 'LIKE', $searchPattern);
+        //         });
 
-            if (!Auth::user()) {
-                $query->where('type', 'news');
-            }
+        //     if (!Auth::user()) {
+        //         $query->where('type', 'news');
+        //     }
             
-            $resultSearch = $query->orderBy('public_date', 'desc')
-                ->paginate($perPage)
-                ->appends(['search' => $search]);
+        //     $resultSearch = $query->orderBy('public_date', 'desc')
+        //         ->paginate($perPage)
+        //         ->appends(['search' => $search]);
 
-        }
+        // }
+
+
+        // $data = [
+        //     'title' => $title,
+        //     'search' => $search,
+        //     'resultSearch' => $resultSearch
+        // ];
 
 
         $data = [
-            'title' => $title,
-            'search' => $search,
-            'resultSearch' => $resultSearch
+            'title' => 'Пошук',
         ];
-
 
         return view('main_page.search', $data);
 
