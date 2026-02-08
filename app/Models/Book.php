@@ -20,7 +20,7 @@ class Book extends Model
     public function translates(){
         return $this->hasMany(BookTranslate::class, 'book_id', 'id');
     }
-
+    
     public function tags(){
         return $this->belongsToMany(Tag::class, 'books_tags'); 
     }

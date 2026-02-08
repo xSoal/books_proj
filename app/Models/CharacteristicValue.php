@@ -19,4 +19,6 @@ class CharacteristicValue extends Model
     public function translates(){
         return $this->hasMany(CharacteristicValueTranslate::class, 'char_val_id', 'id');
     }
+
+
 }
