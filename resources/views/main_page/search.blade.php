@@ -70,26 +70,100 @@
 
             @foreach ($chars as $char)
             @if (count($char->char_vals))
-            <?php
-                $has_selected_char_val = $char->char_vals->first(function($val) use ($selected_char_vals_id) {
-                    return in_array($val->id, $selected_char_vals_id);
-                });
-            ?>
-            <div class="filter-group char {{ $has_selected_char_val ? 'selected' : '' }}" data-char-slug="{{ $char->translates[app()->getLocale()]->slug }}">
-                <label>{{ $char->translates[app()->getLocale()]->name }}</label>
-                <div class="checkbox-list">
-                    @foreach ($char->char_vals as $char_val)
-                    <?php
-                        $selected =  in_array($char_val->id, $selected_char_vals_id);
-                    ?>  
-                    <label>
-                        <input type="checkbox" data-slug="{{ $char_val->translates[app()->getLocale()]->slug }}" {{ $selected ? 'checked' : '' }} >{{ $char_val->translates[app()->getLocale()]->name }}
-                    </label>
-                    @endforeach
+                <?php
+                    // dd($selected_input_range);
+                    $has_selected_char_val = $char->char_vals->first(function($val) use ($selected_char_vals_id) {
+                        return in_array($val->id, $selected_char_vals_id);
+                    });
+                ?>
+                @if($char->is_numeric === 1)
+                <div class="filter-group input__numericRange numeric" data-slug="{{ $char->translates[app()->getLocale()]->slug }}">
+                    <label>{{ $char->translates[app()->getLocale()]->name }}</label>
+                    <div class="range-slider-container">
+                        <div class="slider-track"></div>
+                        <input type="range" min="{{ $char['total_min'] }}" max="{{ $char['total_max'] }}" value="{{ isset($selected_input_range[$char->id]) ? $selected_input_range[$char->id]['cur_min'] : $char['total_min'] }}" class="slider_range_1" >
+                        <input type="range" min="{{ $char['total_min'] }}" max="{{ $char['total_max'] }}" value="{{ isset($selected_input_range[$char->id]) ? $selected_input_range[$char->id]['cur_max'] : $char['total_max'] }}" class="slider_range_2" >
+                    </div>
+                    <div class="range-values">
+                        <span class="range_1">{{ isset($selected_input_range[$char->id]) ? $selected_input_range[$char->id]['cur_min'] : $char['total_min'] }}</span>
+                        <span> — </span>
+                        <span class="range_2">{{ isset($selected_input_range[$char->id]) ? $selected_input_range[$char->id]['cur_max'] : $char['total_max'] }}</span>
+                    </div>
+                    <br>
+                    <div class="input__numericRangeButtonCont">
+                        <a class="btn-reset input__numericRangeButton">Ок</a>
+                    </div>
                 </div>
-            </div>
+                @endif
             @endif
+            @endforeach
 
+            @foreach ($chars as $char)
+            @if (count($char->char_vals))
+                <?php
+                    $has_selected_char_val = $char->char_vals->first(function($val) use ($selected_char_vals_id) {
+                        return in_array($val->id, $selected_char_vals_id);
+                    });
+                ?>
+                @if($char->is_numeric === 0)
+                <div class="filter-group char {{ $has_selected_char_val ? 'selected' : '' }}" data-char-slug="{{ $char->translates[app()->getLocale()]->slug }}">
+                    <label>{{ $char->translates[app()->getLocale()]->name }}</label>
+                    <div class="checkbox-list">
+                        @foreach ($char->char_vals as $char_val)
+                        <?php
+                            $current_val_slug = $char_val->translates[app()->getLocale()]->slug;
+                            $parent_slug = $char->translates[app()->getLocale()]->slug;
+                            $selected = in_array($char_val->id, $selected_char_vals_id);
+                        
+                            $path = Request::path(); 
+                            $path_segments = explode('/', $path);
+                            
+                            // Ищем, есть ли уже в пути сегмент этого родителя (например, 'avtori-...')
+                            $found_index = -1;
+                            foreach ($path_segments as $idx => $segment) {
+                                if (str_starts_with($segment, $parent_slug . '-')) {
+                                    $found_index = $idx;
+                                    break;
+                                }
+                            }
+                        
+                            if ($selected) {
+                                $current_segment = $path_segments[$found_index];
+                                $new_segment = str_replace(['-' . $current_val_slug, $current_val_slug . '-'], '', $current_segment);
+                                
+                                if ($new_segment === $parent_slug) {
+                                    unset($path_segments[$found_index]);
+                                } else {
+                                    $path_segments[$found_index] = $new_segment;
+                                }
+                            } else {
+                                // ЛОГИКА ДОБАВЛЕНИЯ
+                                if ($found_index !== -1) {
+                                    // Добавляем к существующему сегменту
+                                    $path_segments[$found_index] .= '-' . $current_val_slug;
+                                } else {
+                                    // Создаем новый сегмент в конце
+                                    $path_segments[] = $parent_slug . '-' . $current_val_slug;
+                                }
+                            }
+                        
+                            // Собираем URL: очищаем пустые, склеиваем и добавляем GET-параметры (сортировку)
+                            $final_path = implode('/', array_filter($path_segments));
+                            if (!str_starts_with($final_path, 'search')) $final_path = 'search/' . $final_path;
+                            
+                            $url_for_input = url($final_path) . (Request::getQueryString() ? '?' . Request::getQueryString() : '');
+                        ?>
+                        <label>
+                            <a href="{{ $url_for_input }}">
+                                <input type="checkbox" data-slug="{{ $current_val_slug }}" {{ $selected ? 'checked' : '' }} style="pointer-events: none;">
+                                {{ $char_val->translates[app()->getLocale()]->name }}
+                            </a>
+                        </label>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+            @endif
             @endforeach
             {{-- <div class="filter-group">
                 <label>Тематичні категорії</label>
@@ -108,16 +182,24 @@
 
     <main class="content">
         <div class="results-header">
-            <div class="results-count">Знайдено записів: {{ count($books) + 1 }}</div>
-            {{-- <div class="sorting-controls">
+            <div class="results-count">Знайдено записів: {{ count($books) }}</div>
+            <div class="sorting-controls">
                 <label for="sort">Сортувати за:</label>
+                <?php
+                    $sortOptions = [
+                        'name-asc' => 'Алфавітом',
+                    ];
+                ?>
                 <select id="sort">
-                    <option>Роком</option>
-                    <option>Автором</option>
-                    <option>Алфавітом</option>
-                    <option>Типом публікації</option>
+                    <option value="">За замовчуванням</option>
+                    @foreach ($sortOptions as $key => $value)
+                        <option value="{{ $key }}" {{ request('order') === $key ? 'selected' : ''}}>{{ $value }}</option>
+                    @endforeach
+                    @foreach ($chars_for_sorted_map as $key => $value )
+                        <option value="{{ $key }}-desc" {{ request('order') === $key . '-desc' ? 'selected' : ''}}>{{ $value['name'] }}</option>
+                    @endforeach
                 </select>
-            </div> --}}
+            </div>
         </div>
 
         <div class="records-container">
@@ -144,18 +226,6 @@
                 </article>
             @endforeach
 
-
-            <article class="record-card">
-                <span class="badge">Стаття</span>
-                <h3 class="record-title">
-                    <a href="#">Дослідження юдаїки в університетах України (1991-2025)</a>
-                </h3>
-                <p class="record-author">Іваненко І. І., 2022</p>
-                <p class="record-details">Часопис: Юдаїка сьогодні | ISSN: 2222-1111</p>
-                <div class="record-tags">
-                    <span class="tag">Освіта</span>
-                </div>
-            </article>
         </div>
     </main>
 </div>

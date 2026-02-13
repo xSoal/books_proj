@@ -14,7 +14,10 @@ class Characteristic extends Model
     protected $fillable = [
         'img',
         'active',
-        'sort'
+        'sort',
+        'in_filter',
+        'is_numeric',
+        'can_sorted_by'
     ];
 
     public function translates(){

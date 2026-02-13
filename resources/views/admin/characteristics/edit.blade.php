@@ -129,6 +129,69 @@
                 </div>
             </div>
 
+            <div class="form_block in_filter">
+                <div class="fb_inside">
+                    <div class="fb_label">
+                        <div class="fb_label_inside">
+                            <label for="product">В фільтрі</label>
+                        </div>
+                    </div>
+                    <div class="fb_input input_toggle">
+                        <div class="fb_input_inside">
+                            <input type="hidden" name="in_filter" id="in_filter" value="{{ $item->in_filter ?? 1 }}">
+                            <div class="toggle {{ isset($item) ? 
+                                                    $item->in_filter === 1 ? 'active' : '' 
+                                                    : 'active'
+                                                }}">
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form_block is_numeric">
+                <div class="fb_inside">
+                    <div class="fb_label">
+                        <div class="fb_label_inside">
+                            <label for="product">Числовий фільтр</label>
+                        </div>
+                    </div>
+                    <div class="fb_input input_toggle">
+                        <div class="fb_input_inside">
+                            <input type="hidden" name="is_numeric" id="is_numeric" value="{{ $item->is_numeric ?? 1 }}">
+                            <div class="toggle {{ isset($item) ? 
+                                                    $item->is_numeric === 1 ? 'active' : '' 
+                                                    : 'active'
+                                                }}">
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form_block can_sorted_by">
+                <div class="fb_inside">
+                    <div class="fb_label">
+                        <div class="fb_label_inside">
+                            <label for="product">Можно сортувати за</label>
+                        </div>
+                    </div>
+                    <div class="fb_input input_toggle">
+                        <div class="fb_input_inside">
+                            <input type="hidden" name="can_sorted_by" id="can_sorted_by" value="{{ $item->can_sorted_by ?? 1 }}">
+                            <div class="toggle {{ isset($item) ? 
+                                                    $item->can_sorted_by === 1 ? 'active' : '' 
+                                                    : 'active'
+                                                }}">
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="form_block">
                 <div class="fb_inside">
                     <div class="fb_label">

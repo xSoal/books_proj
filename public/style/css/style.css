@@ -306,15 +306,85 @@ textarea:focus-visible {
 }
 
 .filter-form .filter-group {
-    order: 1;
+    order: 3;
 }
 
 .filter-form .filter__resetCont {
-    order: 2;
+    order: 4;
+}
+
+.filter-group.numeric {
+    order: 1;
 }
 
 .filter-group.selected {
-    order: 0;
+    order: 2;
+}
+
+.input__numericRangeButtonCont {
+    text-align: center;
+}
+
+.range-slider-container {
+    position: relative;
+    width: 100%;
+    height: 40px;
+    margin-top: 10px;
+}
+
+/* Скрываем стандартный вид ползунков, чтобы наложить их друг на друга */
+input[type="range"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 100%;
+    outline: none;
+    position: absolute;
+    margin: auto;
+    top: 0;
+    bottom: 0;
+    background-color: transparent;
+    pointer-events: none;
+}
+
+/* Полоса, по которой бегают ползунки */
+.slider-track {
+    width: 100%;
+    height: 5px;
+    position: absolute;
+    margin: auto;
+    top: 0;
+    bottom: 0;
+    border-radius: 5px;
+    background-color: var(--color-beige); /* Использование вашей переменной */
+}
+
+/* Стили для кружков (ползунков) */
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 18px;
+    width: 18px;
+    background-color: var(--color-accent-brown); /* Акцент из вашего списка */
+    cursor: pointer;
+    border-radius: 50%;
+    pointer-events: auto;
+    border: 2px solid var(--color-white);
+    box-shadow: 0 0 2px rgba(0,0,0,0.3);
+}
+
+input[type="range"]:focus::-webkit-slider-thumb {
+    outline: 2px solid var(--color-focus); /* Цвет фокуса из списка */
+}
+
+/* Блок с текстовыми значениями под слайдером */
+.range-values {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    font-weight: bold;
+    color: var(--color-dark-brown);
+    margin-top: 5px;
+    font-size: 0.9rem;
 }
 
 .sidebar {
@@ -338,6 +408,11 @@ textarea:focus-visible {
     font-weight: bold;
     margin-bottom: 10px;
     font-size: 0.9rem;
+}
+
+.filter-group a {
+    text-decoration: none;
+    color: inherit
 }
 
 .range-inputs {
@@ -619,6 +694,118 @@ input:focus, select:focus {
     padding: 15px;
     border: 1px solid var(--color-beige);
 }
+
+
+/* Стилі для сторінки авторизації */
+.auth-page {
+    background-color: var(--color-cream);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.auth-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.auth-card {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-beige);
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 12px rgba(44, 24, 16, 0.05);
+}
+
+.auth-title {
+    font-size: 1.8rem;
+    color: var(--color-dark-brown);
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.auth-subtitle {
+    font-size: 0.9rem;
+    color: var(--color-accent-brown);
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+    color: var(--color-dark-brown);
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--color-beige);
+    background-color: var(--color-cream);
+    font-family: inherit;
+}
+
+.form-group input:focus {
+    outline: 2px solid var(--color-focus);
+    background-color: var(--color-white);
+}
+
+.auth-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    margin-bottom: 25px;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.forgot-link {
+    color: var(--color-focus);
+    text-decoration: none;
+}
+
+.forgot-link:hover {
+    text-decoration: underline;
+}
+
+.btn-login {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--color-dark-brown);
+    color: var(--color-white);
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-login:hover {
+    background-color: var(--color-accent-brown);
+}
+
+/* Адаптивність */
+@media (max-width: 480px) {
+    .auth-card {
+        padding: 30px 20px;
+    }
+}
+
 
 /* Адаптивність */
 @media (max-width: 1024px) {

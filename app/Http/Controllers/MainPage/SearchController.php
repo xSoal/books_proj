@@ -20,250 +20,224 @@ use Illuminate\Support\Facades\DB;
 
 class SearchController extends Controller
 {
-    public function index(Request $request, $filters = null){
-        // $search = trim($request->input('search'));
-        // $perPage = 9;
-
-        // $titles = DB::table('settings')
-        //     ->where('type', 'titles')
-        //     ->first()->value;
-        // $title = json_decode($titles)->search;
-        
-
-
-        // if(!$search){
-        //     // Создание пустого пагинатора, без запроса к БД
-        //     $resultSearch = new LengthAwarePaginator(
-        //         new Collection(), 
-        //         0,
-        //         $perPage,
-        //         LengthAwarePaginator::resolveCurrentPage(),
-        //         ['path' => $request->url(), 'query' => $request->query()]
-        //     );
-
-        // } else {
-
-        //     $searchPattern = '%' . $search . '%';
-        //     $today = Carbon::today();
-
-        //     $query = News::whereDate('public_date', '<=', $today)
-        //         ->where('active', 1)
-        //         ->where(function ($q) use ($searchPattern) {
-        //             $q->where('title', 'LIKE', $searchPattern) 
-        //             ->orWhere('content', 'LIKE', $searchPattern);
-        //         });
-
-        //     if (!Auth::user()) {
-        //         $query->where('type', 'news');
-        //     }
-            
-        //     $resultSearch = $query->orderBy('public_date', 'desc')
-        //         ->paginate($perPage)
-        //         ->appends(['search' => $search]);
-
-        // }
-
-
-        // $data = [
-        //     'title' => $title,
-        //     'search' => $search,
-        //     'resultSearch' => $resultSearch
-        // ];
-
-        // $chars = Characteristic::where('need_approve', 0)->with('translates')->get();
-        // $chars->transform(function ($chars) {
-        //     $chars->setRelation('translates', $chars->translates->keyBy('lang'));
-        //     return $chars;
-        // });
-
-        // $char_vals = CharacteristicValue::where('need_approve', 0)->with('translates')->get();
-        // $char_vals->transform(function ($char_vals) {
-        //     $char_vals->setRelation('translates', $char_vals->translates->keyBy('lang'));
-        //     return $char_vals;
-        // });
-
-
-        // $search = trim($request->input('search'));
-        
-        $chars = Characteristic::where('need_approve', 0)
-            ->whereExists(function ($query) {
-                $query->select(DB::raw(1))
-                    ->from('books_char_val')
-                    ->join('char_vals', 'books_char_val.char_val_id', '=', 'char_vals.id')
-                    ->whereColumn('char_vals.characteristic_id', 'characteristics.id');
-            })
-            ->with(['translates', 'char_vals' => function($query) {
-                $query
-                // ->where('need_approve', 0)
-                ->with('translates');
-            }])
+    public function index(Request $request, $filters = null)
+{
+    // --- 1. Подготовка характеристик (без изменений) ---
+    $chars = Characteristic::where('need_approve', 0)
+        // ->where('is_numeric', 0)
+        ->whereExists(function ($query) {
+            $query->select(DB::raw(1))
+                ->from('books_char_val')
+                ->join('char_vals', 'books_char_val.char_val_id', '=', 'char_vals.id')
+                ->whereColumn('char_vals.characteristic_id', 'characteristics.id');
+        })
+        ->with(['translates', 'char_vals' => fn($q) => $q->with('translates')])
         ->get();
 
-        $chars->each(function ($char) {
-            $char->setRelation('translates', $char->translates->keyBy('lang'));
+    $chars->each(function ($char) {
+        $char->setRelation('translates', $char->translates->keyBy('lang'));
+        $char->char_vals->each(fn($v) => $v->setRelation('translates', $v->translates->keyBy('lang')));
 
-            $char->char_vals->each(function ($value) {
-                $value->setRelation('translates', $value->translates->keyBy('lang'));
-            });
-        });
+        // Если характеристика числовая, вычисляем границы
+        if ($char->is_numeric) {
+            $currentLang = app()->getLocale();
+            
+            // Собираем все значения 'name' для текущего языка, фильтруем только числа
+            $numericValues = $char->char_vals->map(function ($val) use ($currentLang) {
+                $name = $val->translates[$currentLang]->name ?? null;
+                return is_numeric($name) ? (float)$name : null;
+            })->filter(fn($v) => !is_null($v));
 
-        // $chars_map = $chars->map(function ($char){
-        //     return [
-        //         $char->translates[app()->getLocale()]->slug => $char->id
-        //     ];
-        // })->toArray();
-
-        $chars_map = [];
-       
-        foreach ($chars as $key => $value) {
-            $chars_map[ $value->translates[app()->getLocale()]->slug ] = $value->id;
-        
-
-
+            // Добавляем атрибуты прямо в объект модели
+            if ($numericValues->isNotEmpty()) {
+                $char->total_min = $numericValues->min();
+                $char->total_max = $numericValues->max();
+            } else {
+                $char->total_min = 0;
+                $char->total_max = 0;
+            }
         }
-        // чтобы найти снчала самое длинное совпадение
-        uksort($chars_map, function($a, $b) {
-            return strlen($b) <=> strlen($a);
-        });
+    });
 
+    $chars_map = [];
+    foreach ($chars as $value) {
+        $chars_map[$value->translates[app()->getLocale()]->slug] = [
+            'id' => $value->id,
+            'is_numeric' => $value->is_numeric
+        ];
+    }
+    uksort($chars_map, fn($a, $b) => strlen($b) <=> strlen($a));
 
-        $selected_char_vals_id = [];
-        if($filters){
-            $filter_parts =  explode('/', $filters);
-            foreach ($filter_parts as $key => $part) {
-                $parent_char_id = null;
-                $char_vals_slugs = null;
-                foreach ($chars_map as $char_slug => $char_id)  {
-                    if (str_starts_with($part, $char_slug . '-')) {
-                        $char_vals_slugs = substr($part, strlen($char_slug) + 1);
-                        $parent_char_id = $char_id;
-                    }
+    $chars_for_sorted_by = Characteristic::where('can_sorted_by', 1)->with('translates')->get();
+    $chars_for_sorted_map = [];
+    foreach ($chars_for_sorted_by as $value) {
+        $value->setRelation('translates', $value->translates->keyBy('lang'));
+        $chars_for_sorted_map[$value->translates[app()->getLocale()]->slug] = [
+            'name' => $value->translates[app()->getLocale()]->name,
+            'id' => $value->id
+        ];
+    }
+
+    // --- 2. Сбор всех ID выбранных характеристик из URL ---
+    $selected_input_range = [];
+    $selected_char_vals_id = [];
+    if ($filters) {
+        $filter_parts = explode('/', $filters);
+        foreach ($filter_parts as $part) {
+            $parent_char_id = null;
+            $parent_char_is_numeric = false;
+            $char_vals_slugs = null;
+            
+            foreach ($chars_map as $char_slug => $char) {
+                if (str_starts_with($part, $char_slug . '-')) {
+                    $char_vals_slugs = substr($part, strlen($char_slug) + 1);
+                    $parent_char_id = $char['id'];
+                    $parent_char_is_numeric = $char['is_numeric'] === 1;
+                    break;
                 }
-                if(!$parent_char_id){
-                    abort(404, 'Характеристику не знайдено');
-                }
-    
-                // все значения текущей характеристики
+            }
+            
+            if ($parent_char_id && !$parent_char_is_numeric) {
+
                 $char_vals_from_parent_map = [];
-    
-                foreach ($chars->find($parent_char_id)->char_vals as $c => $char) {
-                    $char_vals_from_parent_map[ $char->translates[app()->getLocale()]->slug ] = $char->id;
+                foreach ($chars->find($parent_char_id)->char_vals as $char_val) {
+                    $char_vals_from_parent_map[$char_val->translates[app()->getLocale()]->slug] = $char_val->id;
                 }
-                uksort($char_vals_from_parent_map, function($a, $b) {
-                    return strlen($b) <=> strlen($a);
-                });
-    
-    
-                // if($key === 1){
-                //     dd($char_vals_slugs, $char_vals_from_parent_map, $filter_parts);
-                // }
-    
-    
+                uksort($char_vals_from_parent_map, fn($a, $b) => strlen($b) <=> strlen($a));
+
                 $temp_slugs_string = $char_vals_slugs;
-    
                 while (strlen($temp_slugs_string) > 0) {
                     $found = false;
-                
                     foreach ($char_vals_from_parent_map as $val_slug => $val_id) {
-                        $val_slug = (string)$val_slug;
-                        $is_match = ($temp_slugs_string === $val_slug) || 
-                                    (strpos($temp_slugs_string, $val_slug . '-') === 0);
-                
-                        if ($is_match) {
+                        if ($temp_slugs_string === (string)$val_slug || strpos($temp_slugs_string, $val_slug . '-') === 0) {
                             $selected_char_vals_id[] = $val_id;
-                            
                             $cutLength = strlen($val_slug);
-                            // Если в строке после слага идет дефис, отрезаем и его
-                            if (isset($temp_slugs_string[$cutLength]) && $temp_slugs_string[$cutLength] === '-') {
-                                $cutLength += 1;
-                            }
-                
+                            if (isset($temp_slugs_string[$cutLength]) && $temp_slugs_string[$cutLength] === '-') $cutLength++;
                             $temp_slugs_string = substr($temp_slugs_string, $cutLength);
                             $found = true;
-                            break; 
+                            break;
                         }
                     }
-                    // dd($selected_char_vals_id);
-    
-                    // Если прошли все возможные слаги из мапы и ничего не нашли, а строка не пуста
-                    if (!$found) {
-                        abort(404, 'Значение характеристики не найдено');
-                    }
+                    if (!$found) abort(404, 'Значение характеристики не найдено');
                 }
-    
-            }
-
-            $books_id = DB::table('books_char_val')
-                ->whereIn('char_val_id', $selected_char_vals_id)
-                ->pluck('book_id') // толко  book_id
-                ->unique()        
-                ->toArray();
-            // dd($selected_char_vals_id);
-            $books = Book::with(['translates']) 
-                ->whereIn('id', $books_id)
-                ->get();
-            $books->each(function ($book) {
-                $book->setRelation('translates', $book->translates->keyBy('lang'));
-            });
-        } else {
-            $books = Book::get();
-            $books->each(function ($book) {
-                $book->setRelation('translates', $book->translates->keyBy('lang'));
-            });
-        }
-
-
-
-
-        // dd($selected_char_vals_id);
-
-        // dd($filters);
-
-
-        $data = [
-            'title' => 'Пошук',
-            'chars' => $chars,
-            'selected_char_vals_id' => $selected_char_vals_id,
-            'books' => $books
-        ];
-
-        return view('main_page.search', $data);
-
-    }
-}
-
-
-
-// public function search(Request $request)
-//     {
-//         // Получаем и очищаем поисковую строку
-//         $searchText = trim($request->input('search', '')); 
-//         $perPage = 15;
-
-//         // Если строка пуста, возвращаем все записи или делаем редирект
-//         if (empty($searchText)) {
-//             $items = News::paginate($perPage);
-//         } else {
-//             // Разбиваем строку на отдельные слова, убирая лишние пробелы
-//             $searchWords = preg_split('/\s+/', $searchText, -1, PREG_SPLIT_NO_EMPTY);
-            
-//             // Запускаем запрос
-//             $items = News::where(function ($query) use ($searchWords) {
+            } else if ($parent_char_id && $parent_char_is_numeric) {
+                // 1. Разбиваем строку на части (например, "100-500" -> ["100", "500"])
+                $range_parts = explode('-', $char_vals_slugs);
                 
-//                 // Применяем условие для КАЖДОГО слова
-//                 foreach ($searchWords as $word) {
-//                     $query->where(function ($q) use ($word) {
-//                         $searchTerm = '%' . $word . '%';
-                        
-//                         // Ищем это слово в поле title ИЛИ в поле content
-//                         $q->where('title', 'LIKE', $searchTerm)
-//                           ->orWhere('content', 'LIKE', $searchTerm);
-//                     });
-//                 }
+                // Очищаем от пустых и берем только числовые значения
+                $numbers = array_values(array_filter($range_parts, fn($v) => is_numeric($v)));
+            
+                if (count($numbers) >= 2) {
+                    $min = min($numbers[0], $numbers[1]);
+                    $max = max($numbers[0], $numbers[1]);
 
-//             })->paginate($perPage)
-//               ->appends(['search' => $searchText]); // Сохраняем запрос в пагинации
-//         }
+                    // 2. Ищем все ID значений этой характеристики, которые числово входят в диапазон
+                    // Мы берем name из таблицы переводов и приводим его к числу в SQL
+                    $range_val_ids = DB::table('char_vals')
+                        ->join('char_vals_trans', 'char_vals.id', '=', 'char_vals_trans.char_val_id')
+                        ->where('char_vals.characteristic_id', $parent_char_id)
+                        ->where('char_vals_trans.lang', app()->getLocale())
+                        // CAST name в UNSIGNED или DECIMAL для корректного сравнения
+                        ->whereRaw("CAST(char_vals_trans.name AS UNSIGNED) BETWEEN ? AND ?", [$min, $max])
+                        ->pluck('char_vals.id')
+                        ->toArray();
 
-//         return view('admin.news.list', compact('items', 'searchText'));
-//     }
+
+                        $selected_input_range [$parent_char_id] = [
+                            'cur_min' => $min,
+                            'cur_max' => $max,
+                        ];
+            
+                    // 3. Добавляем найденные ID в общий массив для фильтрации
+                    if (!empty($range_val_ids)) {
+                        $selected_char_vals_id = array_merge($selected_char_vals_id, $range_val_ids);
+                    } else {
+                        abort(404);
+                    }
+                } else {
+                    abort(404);
+                }
+            }
+        }
+    }
+
+    // --- 3. Построение запроса (Сортировка теперь работает всегда) ---
+    // Используем books.active для избежания конфликтов имен при JOIN
+    $query = Book::where('books.active', 1);
+
+    // ФИЛЬТР: "Любые из выбранных" (Логика OR)
+    if (!empty($selected_char_vals_id)) {
+        $query->whereHas('char_vals', function($q) use ($selected_char_vals_id) {
+            // Ищем книги, у которых id значения входит в список выбранных
+            $q->whereIn('char_vals.id', $selected_char_vals_id);
+        });
+    }
+
+    // ПОИСК: Если передан параметр search
+    if ($request->filled('search')) {
+        $search = '%' . trim($request->search) . '%';
+        $query->whereHas('translates', fn($q) => $q->where('name', 'LIKE', $search));
+    }
+
+    // СОРТИРОВКА:
+    $order = $request->query('order');
+    if ($order) {
+        $parts = explode('-', $order);
+        $field = $parts[0];
+        $direction = $parts[1] ?? 'asc';
+
+        switch ($field) {
+            case 'name':
+                $query->join('books_translates', 'books.id', '=', 'books_translates.book_id')
+                    ->where('books_translates.lang', app()->getLocale())
+                    ->select('books.*')
+                    ->orderBy('books_translates.name', $direction);
+                break;
+
+            default:
+                if (isset($chars_for_sorted_map[$field])) {
+                    $charId = $chars_for_sorted_map[$field]['id'];
+                    $currentLang = app()->getLocale();
+
+                    $sortQuery = DB::table('char_vals_trans as cvt')
+                        ->join('char_vals as cv', 'cvt.char_val_id', '=', 'cv.id')
+                        ->join('books_char_val as bcv', 'cv.id', '=', 'bcv.char_val_id')
+                        ->whereColumn('bcv.book_id', 'books.id')
+                        ->where('cv.characteristic_id', $charId)
+                        ->where('cvt.lang', $currentLang)
+                        ->select('cvt.name')
+                        ->limit(1);
+
+                    $query->select('books.*')->selectSub($sortQuery, 'sort_val');
+
+                    $characteristic = $chars_for_sorted_by->where('id', $charId)->first();
+                    if ($characteristic && $characteristic->is_numeric) {
+                        $query->orderByRaw("ISNULL(sort_val) ASC, CAST(NULLIF(sort_val, '') AS SIGNED) $direction");
+                    } else {
+                        $query->orderByRaw("ISNULL(sort_val) ASC, LOWER(sort_val) COLLATE utf8mb4_unicode_ci $direction");
+                    }
+                } else {
+                    $query->orderBy('books.id', 'desc');
+                }
+                break;
+        }
+    } else {
+        // Стандартная сортировка, если ничего не выбрано
+        $query->orderBy('books.id', 'desc');
+    }
+
+    // Получаем результат (distinct нужен, чтобы избежать дублей из-за JOIN/whereHas)
+    $books = $query->with('translates')->distinct()->get();
+
+    $books->each(fn($b) => $b->setRelation('translates', $b->translates->keyBy('lang')));
+
+    return view('main_page.search', [
+        'title' => 'Пошук',
+        'chars' => $chars,
+        'selected_char_vals_id' => $selected_char_vals_id,
+        'books' => $books,
+        'chars_for_sorted_map' => $chars_for_sorted_map,
+        'selected_input_range' => $selected_input_range
+    ]);
+}
+}

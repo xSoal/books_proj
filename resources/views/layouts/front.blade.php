@@ -40,10 +40,10 @@
     @endif
 
 
-    <div class="wrapper">
+    <div class="main-content-wrapper">
         @include('front.header')
         @include('front.mobile-nav')
-        <main>
+        <main class="container">
         @yield('content')
         </main>
         @include('front.modals.auth-popup')

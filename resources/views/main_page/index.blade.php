@@ -16,7 +16,7 @@
             {!! $about_us !!}
           </div>  
           <div class="cta-group">
-              <a href="#search" class="btn btn-primary">Почати пошук</a>
+              <a href="{{ route('search') }}" class="btn btn-primary">Почати пошук</a>
               <a href="#browse" class="btn btn-outline">Переглянути всі записи</a>
           </div>
       </div>

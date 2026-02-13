@@ -25,4 +25,14 @@ class Book extends Model
         return $this->belongsToMany(Tag::class, 'books_tags'); 
     }
 
+    public function char_vals()
+    {
+        return $this->belongsToMany(
+            CharacteristicValue::class, 
+            'books_char_val',           
+            'book_id',                  
+            'char_val_id'               
+        );
+    }
+
 }
