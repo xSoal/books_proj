@@ -17,7 +17,7 @@
           </div>  
           <div class="cta-group">
               <a href="{{ route('search') }}" class="btn btn-primary">{{ $translates['start_search'] }}</a>
-              <a href="#browse" class="btn btn-outline">{{ $translates['see_all_recordings'] }}</a>
+              <a href="{{ route('browse') }}" class="btn btn-outline">{{ $translates['see_all_recordings'] }}</a>
           </div>
       </div>
   </section>

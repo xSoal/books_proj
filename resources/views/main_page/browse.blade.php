@@ -52,7 +52,7 @@
 <div class="container main-layout browse-page"> 
     <main class="content">
         <div class="results-header">
-            <div class="results-count">Знайдено записів: {{ count($books) }}</div>
+            <div class="results-count">Знайдено записів: {{ $books->total() }}</div>
             <div class="sorting-controls">
                 <label for="sort">Сортувати за:</label>
                 <?php
@@ -87,7 +87,7 @@
                                 <span>{{ mb_substr($translate->name, 0, 1) }}</span>
                             </div>
                         @endif
-                        <span class="card-badge">{{ $item->type ?? 'Книга' }}</span>
+                        {{-- <span class="card-badge">{{ $item->type ?? 'Книга' }}</span> --}}
                     </div>
 
                     <div class="card-content">
@@ -97,13 +97,13 @@
                             </a>
                         </h3>
                         
-                        <p class="card-author">
+                        {{-- <p class="card-author">
                             {{ $item->author ?? 'Автор не вказаний' }} 
                             @if($item->year) <span class="card-year">({{ $item->year }})</span> @endif
-                        </p>
+                        </p> --}}
 
                         <p class="card-excerpt">
-                            {{ Str::limit($translate->abstract ?? 'Abstract not available', 150) }}
+                            {{ Str::limit($item->translates[app()->getLocale()]->anotation ?? $translates['have_not_anotation'], 150) }}
                         </p>
 
                         <div class="card-footer">
@@ -114,7 +114,7 @@
             @endforeach
         </div>
         
-        <div class="pagination-wrapper">
+        <div class="pagination-container">
             {{ $books->links() }}
         </div>
     </main>

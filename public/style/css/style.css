@@ -944,6 +944,112 @@ input:focus, select:focus {
     text-decoration: underline;
 }
 
+/* Контейнер пагинации */
+.pagination-container {
+    margin: 40px 0;
+    padding: 20px 0;
+}
+
+/* 1. Скрываем текстовую информацию "Showing 1 to 5..." для чистоты дизайна */
+.pagination-container nav > div:first-child {
+    display: none !important;
+}
+
+/* 2. Основная обертка кнопок */
+.pagination-container nav div:last-child {
+    display: flex !important;
+    justify-content: center;
+    width: 100%;
+}
+
+.pagination-container .relative.z-0 {
+    display: inline-flex;
+    box-shadow: none; /* Убираем дефолтную тень Tailwind */
+    border-radius: 0;
+    gap: 5px; /* Расстояние между кнопками */
+}
+
+/* 3. Базовый стиль для всех ссылок и активных элементов */
+.pagination-container .relative.z-0 a, 
+.pagination-container .relative.z-0 span[aria-current="page"] span,
+.pagination-container .relative.z-0 span[aria-disabled="true"] span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 12px !important;
+    margin: 0 !important;
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: var(--color-dark-brown) !important;
+    background-color: var(--color-white) !important;
+    border: 1px solid var(--color-beige) !important;
+    border-radius: 0 !important; /* Квадратные кнопки в академическом стиле */
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+/* 4. Активная страница (текущая) */
+.pagination-container .relative.z-0 span[aria-current="page"] span {
+    background-color: var(--color-dark-brown) !important;
+    color: var(--color-white) !important;
+    border-color: var(--color-dark-brown) !important;
+    z-index: 10;
+}
+
+/* 5. Ховер эффект (кроме активной и отключенной) */
+.pagination-container .relative.z-0 a:hover {
+    background-color: var(--color-beige) !important;
+    color: var(--color-accent-brown) !important;
+    z-index: 5;
+}
+
+/* 6. Отключенные кнопки (стрелки, когда дальше некуда идти) */
+.pagination-container .relative.z-0 span[aria-disabled="true"] span {
+    color: #ccc !important;
+    cursor: default;
+    background-color: var(--color-cream) !important;
+}
+
+/* 7. Стилизация иконок-стрелок (SVG) */
+.pagination-container .relative.z-0 svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* 8. Фокус для доступности */
+.pagination-container .relative.z-0 a:focus {
+    outline: 3px solid var(--color-focus) !important;
+    z-index: 20;
+}
+
+.pagination-container .leading-5 {
+    display: none;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 640px) {
+    /* На мобильных Laravel часто показывает другой блок кнопок. 
+       Сделаем их тоже в нашем стиле */
+    .pagination-container .flex.justify-between.flex-1 {
+        display: flex !important;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .pagination-container .flex.justify-between.flex-1 a,
+    .pagination-container .flex.justify-between.flex-1 span {
+        padding: 10px 20px !important;
+        background-color: var(--color-white) !important;
+        border: 1px solid var(--color-beige) !important;
+        color: var(--color-dark-brown) !important;
+        border-radius: 0 !important;
+        text-decoration: none;
+    }
+}
+
 /* Адаптивність */
 @media (max-width: 992px) {
     .browse-card {

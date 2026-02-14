@@ -34,7 +34,9 @@ class BooksController extends Controller
 
         $input = $request->except('_token');
 
-        $languages = json_decode($input['languages']);
+        if(isset($input['languages'])){
+            $languages = json_decode($input['languages']);
+        }
 
         $input['photo'] = isset($input['photo']) ? $input['photo'] : '';
         
@@ -242,13 +244,32 @@ class BooksController extends Controller
 				$paginate = 25;
 				
 
-                $items = Book::where(function($query) use ($search) {
-                                        $query->orWhere('name', 'LIKE', '%'.$search.'%')
-                                            ->orWhere('email', 'LIKE', '%'.$search.'%');
-                                        })
-                                        ->paginate($paginate);
+                // $items = Book::where(function($query) use ($search) {
+                //                         $query->orWhere('name', 'LIKE', '%'.$search.'%')
+                //                             ->orWhere('email', 'LIKE', '%'.$search.'%');
+                //                         })
+                //                         ->paginate($paginate);
                 
-				
+				$items = Book::where(function($query) use ($search) {
+                        $query->whereHas('translates', function($q) use ($search) {
+                            $q->where(function($innerQ) use ($search) {
+                                $innerQ->where('name', 'LIKE', '%'.$search.'%')
+                                        ->orWhere('anotation', 'LIKE', '%'.$search.'%')
+                                        ->orWhere('slug', 'LIKE', '%'.$search.'%');
+                            });
+                        });
+                        
+                        // $query->orWhere('email', 'LIKE', '%'.$search.'%'); 
+                    })
+                    ->with('translates') 
+                    ->paginate($paginate); 
+                
+                $items->getCollection()->transform(function ($book) {
+                    $book->setRelation('translates', $book->translates->keyBy('lang'));
+                    return $book;
+                });
+
+
                 if( $request['page']==null ){
 					$request['page'] = 1;
 				}

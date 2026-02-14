@@ -7,7 +7,7 @@
         <h1>Список тегів</h1>
     </div>
     <div class="search_block">
-        {{-- <div class="search_form">
+        <div class="search_form">
             <form action="{{ route('admin.postTags') }}" method="POST" class="for_search">
 				{{ csrf_field() }}
                 <div class="form_block fb_query">
@@ -34,7 +34,7 @@
                     </div>
                 </div>
             </form>
-        </div> --}}
+        </div>
         
         <div class="add_new_item">
             <a href="{{ route('admin.addTag') }}" class="add_item">Додати</a>
