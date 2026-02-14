@@ -222,6 +222,27 @@
             </div>
         </div>
 
+        <div class="bottom-search-container">
+            <form action="{{ url()->current() }}" method="GET" class="inline-search-form">
+                
+                @foreach(request()->except(['search', 'page']) as $key => $value)
+                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                @endforeach
+        
+                <div class="search-input-wrapper">
+                    <input type="text" 
+                           name="search" 
+                           value="{{ request('search') }}" 
+                           placeholder="{{ $translates['search'] }}" 
+                           aria-label="{{ $translates['search'] }}"
+                           class="bottom-search-field">
+                    <button type="submit" class="btn btn-primary btn-bottom-search">
+                        {{ $translates['search'] }}
+                    </button>
+                </div>
+            </form>
+        </div>
+
         <div class="records-container">
             {{-- {{ $books }} --}}
             @foreach ($books as $item)

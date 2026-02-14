@@ -206,7 +206,23 @@ class SearchController extends Controller
     // поиска
     if ($request->filled('search')) {
         $search = '%' . trim($request->search) . '%';
-        $query->whereHas('translates', fn($q) => $q->where('name', 'LIKE', $search));
+        $locale = app()->getLocale();
+    
+        $query->where(function ($mainQuery) use ($search, $locale) {
+            // cfvf сама книга
+            $mainQuery->whereHas('translates', function ($q) use ($search, $locale) {
+                $q->where('lang', $locale)
+                  ->where(function ($sub) use ($search) {
+                      $sub->where('name', 'LIKE', $search)
+                          ->orWhere('anotation', 'LIKE', $search); // Убедитесь, что в БД именно 'anotation', а не 'annotation'
+                  });
+            })
+            // 2. ИЛИ поиск по значениям всех характеристик, привязанных к книге
+            ->orWhereHas('char_vals.translates', function ($q) use ($search, $locale) {
+                $q->where('lang', $locale)
+                  ->where('name', 'LIKE', $search);
+            });
+        });
     }
 
     // сорт:

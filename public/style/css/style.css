@@ -288,6 +288,60 @@ textarea:focus-visible {
 }
 
 
+/* Контейнер для форми пошуку знизу */
+.bottom-search-container {
+    padding: 30px;
+    background-color: var(--color-beige); /* Світло-бежевий фон для виділення зони */
+    border: 1px solid var(--color-beige);
+}
+
+.inline-search-form {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.search-input-wrapper {
+    display: flex;
+    gap: 10px; /* Відступ між полем та кнопкою */
+}
+
+/* Поле введення */
+.bottom-search-field {
+    flex: 1; /* Поле займає весь доступний простір */
+    padding: 12px 20px;
+    font-family: inherit;
+    font-size: 1rem;
+    border: 1px solid var(--color-dark-brown);
+    background-color: var(--color-white);
+    color: var(--color-dark-brown);
+}
+
+.bottom-search-field:focus {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 1px;
+}
+
+/* Кнопка пошуку */
+.btn-bottom-search {
+    padding: 0 30px;
+    height: auto; /* Вирівнювання по висоті з input */
+    border-radius: 0; /* Академічний строгий стиль */
+    white-space: nowrap;
+}
+
+/* Адаптивність для мобільних пристроїв */
+@media (max-width: 600px) {
+    .search-input-wrapper {
+        flex-direction: column; /* На малих екранах поле і кнопка стають один під одним */
+    }
+    
+    .btn-bottom-search {
+        width: 100%;
+        padding: 12px;
+    }
+}
+
+
 .section-title {
     text-align: center;
     margin-bottom: 2.5rem;
@@ -494,6 +548,7 @@ input[type="range"]:focus::-webkit-slider-thumb {
 
 .sidebar {
     flex: 0 0 280px;
+    transform: translateY(7px);
 }
 
 .sidebar-title {

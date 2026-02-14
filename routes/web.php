@@ -152,9 +152,9 @@ Route::get('setlocale/{lang}', function ($lang) {
     }
     //формируем полный URL
     $url = Request::root().implode("/", $segments);
-    if(str_contains($url, '/search/')){
-        $url = '/search';
-    }
+    // if(str_contains($url, '/search/')){
+    //     $url = '/search';
+    // }
     //если были еще GET-параметры - добавляем их
     if(parse_url($referer, PHP_URL_QUERY)){
     $url = $url.'?'. parse_url($referer, PHP_URL_QUERY);
