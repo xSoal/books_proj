@@ -54,13 +54,37 @@ function initInputRange(){
 }
 
 
-function initSorting(){
-  if(!$('.filter').length) return;
-  
-  $('#sort')[0].onchange = function(){
-    var url = window.location.href.split('?')[0];
-    var filter = this.value ? `?order=${this.value}` : '';
-    window.location.href = `${url}${filter}`;
+function initSorting() {
+  const sortElement = $('#sort');
+  if (!sortElement.length) return;
+
+  sortElement[0].onchange = function() {
+      const url = new URL(window.location.href);
+      const oldParams = new URLSearchParams(url.search);
+      
+      // Создаем новый объект параметров для контроля порядка
+      const newParams = new URLSearchParams();
+
+      // 1. Сначала добавляем order (если выбран), чтобы он был первым
+      if (this.value) {
+          newParams.set('order', this.value);
+      }
+
+      // 2. Добавляем page вторым (если он был в URL)
+      // При смене сортировки обычно сбрасывают на 1 страницу
+      if (oldParams.has('page')) {
+          newParams.set('page', '1'); 
+      }
+
+      // 3. Добавляем все остальные параметры, которые могли быть
+      oldParams.forEach((val, key) => {
+          if (key !== 'order' && key !== 'page') {
+              newParams.append(key, val);
+          }
+      });
+
+      const queryString = newParams.toString();
+      window.location.href = url.pathname + (queryString ? '?' + queryString : '');
   }
 }
 

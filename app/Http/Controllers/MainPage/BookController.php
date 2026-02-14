@@ -59,10 +59,14 @@ class BookController extends Controller
 
     // $grouped = $chars->groupBy('char_name');
 
+        $locale = app()->getLocale();
+        $translates = DB::table('translates')->pluck($locale, 'slug');
+
         $data = [
             'title' => 'Book',
             'book' => $book,
-            'chars' => $chars
+            'chars' => $chars,
+            'translates' => $translates
         ];
 
         return view('main_page.book', $data);

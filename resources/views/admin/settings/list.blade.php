@@ -44,9 +44,9 @@
                     </div>
                 </div>
             </div>
+            <h1>Про нас на головній сторінці</h1>
 
             <div class="form_block">
-                <h1>Про нас на головній сторінці</h1>
                 <div class="fb_inside">
                     <div class="fb_label">
                         <div class="fb_label_inside">
@@ -72,6 +72,39 @@
                     <div class="fb_input">
                         <div class="fb_input_inside">
                             <textarea id="en" name="en" class="textarea_item">{{ $about_us->en ?? '' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h1>Про нас на окремій сторінці</h1>
+
+            <div class="form_block">
+                <div class="fb_inside">
+                    <div class="fb_label">
+                        <div class="fb_label_inside">
+                            <label for="about_us_full_ua">UA</label>
+                        </div>
+                    </div>
+                    <div class="fb_input">
+                        <div class="fb_input_inside">
+                            <textarea name="about_us_full_ua" id="about_us_full_ua" class="textarea_item">{{ $about_us_full->ua ?? '' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="form_block">
+                <div class="fb_inside">
+                    <div class="fb_label">
+                        <div class="fb_label_inside">
+                            <label for="about_us_full_en">EN</label>
+                        </div>
+                    </div>
+                    <div class="fb_input">
+                        <div class="fb_input_inside">
+                            <textarea id="about_us_full_en" name="about_us_full_en" class="textarea_item">{{ $about_us_full->en ?? '' }}</textarea>
                         </div>
                     </div>
                 </div>

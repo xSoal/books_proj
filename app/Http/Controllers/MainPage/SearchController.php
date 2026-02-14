@@ -231,13 +231,17 @@ class SearchController extends Controller
 
     $books->each(fn($b) => $b->setRelation('translates', $b->translates->keyBy('lang')));
 
+    $locale = app()->getLocale();
+    $translates = DB::table('translates')->pluck($locale, 'slug');
+
     return view('main_page.search', [
         'title' => 'Пошук',
         'chars' => $chars,
         'selected_char_vals_id' => $selected_char_vals_id,
         'books' => $books,
         'chars_for_sorted_map' => $chars_for_sorted_map,
-        'selected_input_range' => $selected_input_range
+        'selected_input_range' => $selected_input_range,
+        'translates' => $translates
     ]);
 }
 }

@@ -11,9 +11,9 @@
 
             <nav class="main-nav" aria-label="Головне меню">
                 <ul class="nav-list">
-                    <li><a href="#browse">Browse (Перегляд)</a></li>
-                    <li><a href="{{ route('search') }}">Search (Пошук)</a></li>
-                    <li><a href="#about">About (Про проєкт)</a></li>
+                    <li><a href="{{ route('browse') }}">{{ $translates['browse'] }}</a></li>
+                    <li><a href="{{ route('search') }}">{{ $translates['search'] }}</a></li>
+                    <li><a href="{{ route('about') }}">{{ $translates['aboute'] }}</a></li>
                 </ul>
                 <div class="language-selector" aria-label="Вибір мови">
                     <a href="{{ route('setlocale', ['lang' => 'ua'])  }}" lang="ua" aria-current="true" class="lang-link {{ app()->getLocale() === 'ua' ? 'active' : '' }}">UA</a>

@@ -49,6 +49,16 @@ textarea:focus-visible {
     outline-offset: 2px;
 }
 
+.tinycont {
+
+}
+
+.body-innerwrapper {
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+}
+
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -115,6 +125,10 @@ textarea:focus-visible {
     background-color: var(--color-beige);
     padding: 5rem 0;
     text-align: center;
+}
+
+.tinycont {
+    text-align:initial;
 }
 
 .hero-section h1 {
@@ -797,6 +811,150 @@ input:focus, select:focus {
 
 .btn-login:hover {
     background-color: var(--color-accent-brown);
+}
+
+.scrollToTopBtn {
+    position: fixed;
+    right: 25px;
+    bottom: 25px;
+}
+
+
+/* Browse Page Specific Styles */
+.browse-page .browse-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.browse-card {
+    flex: 1 1 calc(33.333% - 25px); /* 3 в ряд */
+    min-width: 300px;
+    background: var(--color-white);
+    border: 1px solid var(--color-beige);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.browse-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(44, 24, 16, 0.08);
+}
+
+/* Image & Placeholder */
+.card-image {
+    width: 100%;
+    height: 200px;
+    background-color: var(--color-beige);
+    position: relative;
+    overflow: hidden;
+}
+
+.card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--color-beige) 0%, #dcd6ce 100%);
+}
+
+.card-placeholder span {
+    font-size: 4rem;
+    color: var(--color-white);
+    font-family: serif;
+    opacity: 0.5;
+}
+
+.card-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--color-dark-brown);
+    color: var(--color-white);
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Content */
+.card-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.card-title {
+    font-size: 1.2rem;
+    line-height: 1.3;
+    margin-bottom: 10px;
+}
+
+.card-title a {
+    color: var(--color-dark-brown);
+    text-decoration: none;
+}
+
+.card-title a:hover {
+    color: var(--color-accent-brown);
+}
+
+.card-author {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: var(--color-accent-brown);
+    margin-bottom: 12px;
+}
+
+.card-year {
+    font-weight: normal;
+    color: #888;
+}
+
+.card-excerpt {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 20px;
+    flex-grow: 1;
+}
+
+.card-footer {
+    border-top: 1px solid var(--color-cream);
+    padding-top: 15px;
+}
+
+.btn-more {
+    font-size: 0.85rem;
+    text-decoration: none;
+    color: var(--color-dark-brown);
+    font-weight: bold;
+}
+
+.btn-more:hover {
+    text-decoration: underline;
+}
+
+/* Адаптивність */
+@media (max-width: 992px) {
+    .browse-card {
+        flex: 1 1 calc(50% - 25px); /* 2 в ряд */
+    }
+}
+
+@media (max-width: 650px) {
+    .browse-card {
+        flex: 1 1 100%; /* 1 в ряд */
+    }
 }
 
 /* Адаптивність */

@@ -20,17 +20,40 @@ class MainPageController extends Controller
         });
 
         $about_us = DB::table('settings')->where('type', 'about_us')->first();
+        
         $locale = app()->getLocale();
+        $translates = DB::table('translates')->pluck($locale, 'slug');
 
         $data = [
             'title' => 'title',
             'partners' => $partners,
-            'about_us' => $about_us->$locale
+            'about_us' => $about_us->$locale,
+            'translates' => $translates
             // 'seo' => $seo
         ];
 
 
 
         return view('main_page.index', $data); 
+    }
+
+    
+    public function about(){
+
+        $about_us = DB::table('settings')->where('type', 'about_us_full')->first();
+        
+        $locale = app()->getLocale();
+        $translates = DB::table('translates')->pluck($locale, 'slug');
+
+        $data = [
+            'title' => 'title',
+            'about_us' => $about_us->$locale,
+            'translates' => $translates
+            // 'seo' => $seo
+        ];
+
+
+
+        return view('main_page.about', $data); 
     }
 }

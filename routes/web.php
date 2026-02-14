@@ -124,8 +124,11 @@ Route::group(['prefix' => App\Http\Middleware\LocaleMiddleware::getLocale(), 'mi
     Auth::routes();
     
     Route::get('/', ['uses' => '\App\Http\Controllers\MainPage\MainPageController@index', 'as' => 'main_page']);
+    Route::get('/about', ['uses' => '\App\Http\Controllers\MainPage\MainPageController@about', 'as' => 'about']);
     Route::get('/search/{filters?}', ['uses' => '\App\Http\Controllers\MainPage\SearchController@index', 'as' => 'search'])
         ->where('filters', '.*');
+
+    Route::get('/browse', ['uses' => '\App\Http\Controllers\MainPage\BrowseController@index', 'as' => 'browse']);
 
     Route::get('/book/{slug}', ['uses' => '\App\Http\Controllers\MainPage\BookController@index', 'as' => 'book']);
 });
