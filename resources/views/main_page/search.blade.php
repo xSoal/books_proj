@@ -114,44 +114,64 @@
                             $current_val_slug = $char_val->translates[app()->getLocale()]->slug;
                             $parent_slug = $char->translates[app()->getLocale()]->slug;
                             $selected = in_array($char_val->id, $selected_char_vals_id);
-                        
+
+                            // Получаем текущий путь и разбиваем на сегменты
                             $path = Request::path(); 
                             $path_segments = explode('/', $path);
                             
-                            // Ищем, есть ли уже в пути сегмент этого родителя (например, 'avtori-...')
+                            // Определяем "базу". Если сайт на /en/search, первыми сегментами будут ['en', 'search']
+                            // Нам нужно работать только с тем, что идет ПОСЛЕ слова 'search'
+                            $search_index = array_search('search', $path_segments);
+                            
+                            // Отрезаем базовую часть (локаль + search)
+                            $base_segments = array_slice($path_segments, 0, $search_index + 1);
+                            // Отрезаем фильтры
+                            $filter_segments = array_slice($path_segments, $search_index + 1);
+
+                            // Ищем индекс родительского слага в фильтрах
                             $found_index = -1;
-                            foreach ($path_segments as $idx => $segment) {
+                            foreach ($filter_segments as $idx => $segment) {
                                 if (str_starts_with($segment, $parent_slug . '-')) {
                                     $found_index = $idx;
                                     break;
                                 }
                             }
-                        
+
                             if ($selected) {
-                                $current_segment = $path_segments[$found_index];
+                                // ЛОГИКА УДАЛЕНИЯ
+                                $current_segment = $filter_segments[$found_index];
                                 $new_segment = str_replace(['-' . $current_val_slug, $current_val_slug . '-'], '', $current_segment);
                                 
                                 if ($new_segment === $parent_slug) {
-                                    unset($path_segments[$found_index]);
+                                    unset($filter_segments[$found_index]);
                                 } else {
-                                    $path_segments[$found_index] = $new_segment;
+                                    $filter_segments[$found_index] = $new_segment;
                                 }
                             } else {
                                 // ЛОГИКА ДОБАВЛЕНИЯ
                                 if ($found_index !== -1) {
-                                    // Добавляем к существующему сегменту
-                                    $path_segments[$found_index] .= '-' . $current_val_slug;
+                                    $filter_segments[$found_index] .= '-' . $current_val_slug;
                                 } else {
-                                    // Создаем новый сегмент в конце
-                                    $path_segments[] = $parent_slug . '-' . $current_val_slug;
+                                    $filter_segments[] = $parent_slug . '-' . $current_val_slug;
                                 }
                             }
-                        
-                            // Собираем URL: очищаем пустые, склеиваем и добавляем GET-параметры (сортировку)
-                            $final_path = implode('/', array_filter($path_segments));
-                            if (!str_starts_with($final_path, 'search')) $final_path = 'search/' . $final_path;
+
+                            // Собираем все сегменты воедино (база + измененные фильтры)
+                            $all_segments = array_merge($base_segments, array_filter($filter_segments));
                             
-                            $url_for_input = url($final_path) . (Request::getQueryString() ? '?' . Request::getQueryString() : '');
+                            // Генерируем полный URL
+                            // url('/') создаст https://biblproj/, implode склеит en/search/filters...
+                            $url_for_input = url(implode('/', $all_segments));
+
+                            // Добавляем GET-параметры (сортировка и поиск), но БЕЗ параметра page
+                            // (при смене фильтра логично сбрасывать пагинацию)
+                            $queryParams = Request::query();
+                            unset($queryParams['page']);
+                            
+                            if (!empty($queryParams)) {
+                                $url_for_input .= '?' . http_build_query($queryParams);
+                            }
+    
                         ?>
                         <label>
                             <a href="{{ $url_for_input }}">

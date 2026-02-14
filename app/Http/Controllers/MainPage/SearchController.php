@@ -22,7 +22,6 @@ class SearchController extends Controller
 {
     public function index(Request $request, $filters = null)
 {
-    // --- 1. Подготовка характеристик (без изменений) ---
     $chars = Characteristic::where('need_approve', 0)
         // ->where('is_numeric', 0)
         ->whereExists(function ($query) {
@@ -38,17 +37,16 @@ class SearchController extends Controller
         $char->setRelation('translates', $char->translates->keyBy('lang'));
         $char->char_vals->each(fn($v) => $v->setRelation('translates', $v->translates->keyBy('lang')));
 
-        // Если характеристика числовая, вычисляем границы
         if ($char->is_numeric) {
             $currentLang = app()->getLocale();
             
-            // Собираем все значения 'name' для текущего языка, фильтруем только числа
+            // только числа
             $numericValues = $char->char_vals->map(function ($val) use ($currentLang) {
                 $name = $val->translates[$currentLang]->name ?? null;
                 return is_numeric($name) ? (float)$name : null;
             })->filter(fn($v) => !is_null($v));
 
-            // Добавляем атрибуты прямо в объект модели
+            // Добавляем атрибуты в объект модели
             if ($numericValues->isNotEmpty()) {
                 $char->total_min = $numericValues->min();
                 $char->total_max = $numericValues->max();
@@ -118,10 +116,9 @@ class SearchController extends Controller
                             break;
                         }
                     }
-                    if (!$found) abort(404, 'Значение характеристики не найдено');
+                    if (!$found) abort(404, 'Значенння характеристика не знайдено');
                 }
             } else if ($parent_char_id && $parent_char_is_numeric) {
-                // 1. Разбиваем строку на части (например, "100-500" -> ["100", "500"])
                 $range_parts = explode('-', $char_vals_slugs);
                 
                 // Очищаем от пустых и берем только числовые значения
@@ -132,7 +129,7 @@ class SearchController extends Controller
                     $max = max($numbers[0], $numbers[1]);
 
                     // 2. Ищем все ID значений этой характеристики, которые числово входят в диапазон
-                    // Мы берем name из таблицы переводов и приводим его к числу в SQL
+                    // name из таблицы переводов и приводим его к числу в SQL
                     $range_val_ids = DB::table('char_vals')
                         ->join('char_vals_trans', 'char_vals.id', '=', 'char_vals_trans.char_val_id')
                         ->where('char_vals.characteristic_id', $parent_char_id)
@@ -166,20 +163,53 @@ class SearchController extends Controller
     $query = Book::where('books.active', 1);
 
     // ФИЛЬТР: "Любые из выбранных" (Логика OR)
-    if (!empty($selected_char_vals_id)) {
-        $query->whereHas('char_vals', function($q) use ($selected_char_vals_id) {
-            // Ищем книги, у которых id значения входит в список выбранных
-            $q->whereIn('char_vals.id', $selected_char_vals_id);
-        });
+    // if (!empty($selected_char_vals_id)) {
+    //     $query->whereHas('char_vals', function($q) use ($selected_char_vals_id) {
+    //         // Ищем книги, у которых id значения входит в список выбранных
+    //         $q->whereIn('char_vals.id', $selected_char_vals_id);
+    //     });
+    // }
+
+
+    // 1. Фильтр по числовым диапазонам (обязательное соответствие каждому диапазону)
+    if (!empty($selected_input_range)) {
+        foreach ($selected_input_range as $char_id => $range) {
+            $query->whereHas('char_vals', function($q) use ($char_id, $range) {
+                $q->where('characteristic_id', $char_id)
+                ->join('char_vals_trans', 'char_vals.id', '=', 'char_vals_trans.char_val_id')
+                ->where('char_vals_trans.lang', app()->getLocale())
+                ->whereRaw("CAST(char_vals_trans.name AS UNSIGNED) BETWEEN ? AND ?", [$range['cur_min'], $range['cur_max']]);
+            });
+        }
     }
 
-    // ПОИСК: Если передан параметр search
+    // 2. Фильтр по обычным чекбоксам (Логика: Книга должна иметь хотя бы одно из выбранных значений в группе)
+    // Но если выбрано несколько разных характеристик (напр. Автор И Тип), используем AND между группами
+    if (!empty($selected_char_vals_id)) {
+        // Получаем ID только тех значений, которые НЕ относятся к числовым (они уже обработаны выше)
+        $numeric_char_ids = array_keys($selected_input_range);
+        
+        // Группируем выбранные ID по их характеристикам, чтобы между разными группами был И
+        $grouped_vals = CharacteristicValue::whereIn('id', $selected_char_vals_id)
+            ->whereNotIn('characteristic_id', $numeric_char_ids)
+            ->get()
+            ->groupBy('characteristic_id');
+
+        foreach ($grouped_vals as $char_id => $val_ids) {
+            $query->whereHas('char_vals', function($q) use ($val_ids) {
+                $q->whereIn('char_vals.id', $val_ids->pluck('id'));
+            });
+        }
+    }
+
+
+    // поиска
     if ($request->filled('search')) {
         $search = '%' . trim($request->search) . '%';
         $query->whereHas('translates', fn($q) => $q->where('name', 'LIKE', $search));
     }
 
-    // СОРТИРОВКА:
+    // сорт:
     $order = $request->query('order');
     if ($order) {
         $parts = explode('-', $order);
@@ -222,7 +252,6 @@ class SearchController extends Controller
                 break;
         }
     } else {
-        // Стандартная сортировка, если ничего не выбрано
         $query->orderBy('books.id', 'desc');
     }
 

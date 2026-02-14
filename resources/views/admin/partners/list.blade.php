@@ -8,7 +8,7 @@
     </div>
     <div class="search_block">
         <div class="search_form">
-            <form action="{{ route('admin.postPartners') }}" method="POST" class="for_search">
+            {{-- <form action="{{ route('admin.postPartners') }}" method="POST" class="for_search">
 				{{ csrf_field() }}
                 <div class="form_block fb_query">
                     <div class="fb_inside">
@@ -33,7 +33,7 @@
                         </div>
                     </div>
                 </div>
-            </form>
+            </form> --}}
         </div>
         
         <div class="add_new_item">

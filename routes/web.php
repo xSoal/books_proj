@@ -145,16 +145,21 @@ Route::get('setlocale/{lang}', function ($lang) {
     if (in_array($segments[1], App\Http\Middleware\LocaleMiddleware::$languages)) {
     unset($segments[1]); //удаляем метку
     }
+
     //Добавляем метку языка в URL (если выбран не язык по-умолчанию)
     if ($lang != App\Http\Middleware\LocaleMiddleware::$mainLanguage){
     array_splice($segments, 1, 0, $lang);
     }
     //формируем полный URL
     $url = Request::root().implode("/", $segments);
+    if(str_contains($url, '/search/')){
+        $url = '/search';
+    }
     //если были еще GET-параметры - добавляем их
     if(parse_url($referer, PHP_URL_QUERY)){
     $url = $url.'?'. parse_url($referer, PHP_URL_QUERY);
     }
+
     return redirect($url); //Перенаправляем назад на ту же страницу
 })->name('setlocale');
     

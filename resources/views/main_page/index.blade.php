@@ -22,26 +22,30 @@
       </div>
   </section>
 
-  <section class="partners-section" aria-labelledby="partners-title">
-      <div class="container">
-          <h2 id="partners-title" class="section-title">{{ $translates['partners'] }}</h2>
-          <div class="flex-row partners-list">
-            @foreach ($partners as $partner )
-                <div class="partner-card">
-                    <div class="partner-img">
-                        <img src="{{ $partner->img }}" alt="Partner {{ $partner->name }} logo">
-                    </div>
-                    <div class="partner-name">{{ $partner->translates[app()->getLocale()]['name'] }}</div>
-                    @if($partner->link)
-                        <div class="partner-link">
-                            <a href="{{ $partner->link }}">to site</a>
+    <section class="partners-section" aria-labelledby="partners-title">
+        <div class="container">
+            <h2 id="partners-title" class="section-title">{{ $translates['partners'] }}</h2>
+            
+            <div class="partners-grid">
+                @foreach ($partners as $partner)
+                    <div class="partner-card">
+                        <div class="partner-logo-box">
+                            <img src="{{ $partner->img }}" alt="{{ $partner->translates[app()->getLocale()]['name'] }} logo">
                         </div>
-                    @endif
-                </div>
-            @endforeach
-          </div>
-      </div>
-  </section>
+                        
+                        <div class="partner-details">
+                            <h3 class="partner-name">{{ $partner->translates[app()->getLocale()]['name'] }}</h3>
+                            @if($partner->link)
+                                <a href="{{ $partner->link }}" class="partner-link-static" target="_blank" rel="noopener">
+                                    {{ $translates['site_link'] }}
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
 
   <section class="feedback-section" aria-labelledby="feedback-title">
       <div class="container">

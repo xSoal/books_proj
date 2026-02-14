@@ -4,12 +4,13 @@
 
 
 <main class="container">
-    <a href="{{ route('search') }}" class="back-link">← Повернутися до пошуку</a>
+    <a href="{{ route('search') }}" class="back-link">← До пошуку</a>
+    <a href="{{ route('browse') }}" class="back-link">← До усіх книг</a>
 
     <div class="record-main-container">
         <div class="record-visual">
             <div class="book-placeholder">
-                <span>Обкладинка</span>
+                <span>{{ $translates['book_image'] }}</span>
             </div>
             {{-- <div class="action-buttons">
                 <button class="btn-action">Як цитувати</button>
@@ -23,12 +24,12 @@
             {{-- <p class="entry-authors">Автори: <a href="#">Амос Оз</a> (Автор), <a href="#">Фанія Оз-Зальцбергер</a> (Автор)</p> --}}
             
             <div class="entry-abstract">
-                <h3>Анотація</h3>
+                <h3>{{ $translates['adnotation'] }}:</h3>
                 <p>{{ $book->translates[app()->getLocale()]->anotation }}</p>
             </div>
             
             <div class="full-details">
-                <h3>Деталі видання</h3>
+                <h3>{{ $translates['book_details'] }}</h3>
                 <br>
                 <dl class="details-list">
                     @foreach ($chars as $char)
@@ -47,7 +48,7 @@
                         @endforeach
    
                     @endforeach
-                    <dt>Теги:</dt>
+                    <dt>{{ $translates['tags'] }}:</dt>
                     <dd>
                         <span class="tag">Тег</span>
                     </dd>
