@@ -19,7 +19,7 @@ class UsersController extends Controller
        
         $input = $request->except('_token');
 
-        $input['photo'] = isset($input['photo']) ? $input['photo'] : '';
+        $input['img'] = isset($input['img']) ? $input['img'] : '';
         
         //-----------------------------------------------------------------
         if( isset($input['save']) ||  isset($input['save_and_exit']) ){

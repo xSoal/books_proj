@@ -17,7 +17,7 @@ class CharacteristicsController extends Controller
         if(isset($input['languages'])){
             $languages = json_decode($input['languages']);
         }
-        $input['photo'] = isset($input['photo']) ? $input['photo'] : '';
+        $input['img'] = isset($input['img']) ? $input['img'] : '';
         
         //-----------------------------------------------------------------
         if( isset($input['save']) ||  isset($input['save_and_exit']) ){

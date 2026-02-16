@@ -1203,6 +1203,7 @@ input:focus, select:focus {
     padding: 20px;
     background-color: var(--color-cream);
     border-left: 3px solid var(--color-beige);
+    white-space: pre-line;
 }
 
 .details-list {
