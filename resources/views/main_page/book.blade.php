@@ -13,7 +13,13 @@
     <div class="record-main-container">
         <div class="record-visual">
             <div class="book-placeholder">
-                <span>{{ $translates['book_image'] }}</span>
+                @if($book->img)
+                    <img src="{{ $book->img }}" 
+                         alt="{{ $book->translates[app()->getLocale()]->name }}" 
+                         class="book-cover-img">
+                @else
+                    <span>{{ $translates['book_image'] }}</span>
+                @endif
             </div>
             <button type="button" class="btn-feedback-trigger">
                 {{ $translates['feedback'] ?? 'Зворотній звʼязок' }}

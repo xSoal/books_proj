@@ -1031,12 +1031,45 @@ input:focus, select:focus {
     margin-bottom: 10px;
 }
 
-.badge {
-    background-color: var(--color-beige);
-    padding: 2px 10px;
-    font-size: 0.75rem;
-    text-transform: uppercase;
+/* Контейнер для всього блоку типу видання */
+.type-badge-container {
+    display: flex;
+    flex-wrap: wrap; /* Щоб бейджі переносилися, якщо їх багато */
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
 }
+
+/* Напис "Тип видання:" */
+.type-label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--color-dark-brown); /* Використовуємо ваш колір */
+    white-space: nowrap;
+}
+
+/* Список бейджів */
+.badges-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+/* Стиль самої плашки (бейдж) */
+.badge.badge-type {
+    background-color: #e0e0e0; /* Світло-сірий фон */
+    color: #555555; /* Колір тексту */
+    padding: 3px 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase; /* Робимо великими літерами як на скриншоті */
+    letter-spacing: 0.5px;
+    border-radius: 0; /* Прямі кути */
+    display: inline-block;
+    line-height: 1.4;
+}
+
+/* Додатково: якщо бейдж один, він виглядає так само */
 
 .record-title {
     margin: 10px 0;
@@ -1370,6 +1403,10 @@ input:focus, select:focus {
     overflow: hidden;
 }
 
+.card-image a {
+    text-decoration: none;
+}
+
 .card-image img {
     width: 100%;
     height: 100%;
@@ -1545,6 +1582,42 @@ input:focus, select:focus {
 
 .pagination-container .leading-5 {
     display: none;
+}
+
+.record-visual {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.book-placeholder {
+    width: 100%;
+    /* Задаємо фіксовану пропорцію для блоку (наприклад, 3:4), але картинка всередині підлаштується */
+    aspect-ratio: 3 / 4; 
+    background-color: var(--color-beige); /* */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--color-beige);
+    overflow: hidden; /* Щоб картинка не виходила за межі при завантаженні */
+}
+
+.book-cover-img {
+    width: 100%;
+    height: 100%;
+    /* object-fit: contain гарантує, що картинка не обріжеться, навіть якщо вона панорамна або квадратна */
+    object-fit: contain;
+    /* Якщо хочете, щоб картинка завжди заповнювала блок (можлива обрізка країв): використовуйте cover */
+    /* object-fit: cover; */
+    
+    background-color: var(--color-cream); /* Світлий фон навколо картинки, якщо вона не на весь блок */
+}
+
+.book-placeholder span {
+    color: var(--color-white);
+    font-size: 1.2rem;
+    text-align: center;
+    padding: 20px;
 }
 
 /* Адаптивность для мобильных устройств */

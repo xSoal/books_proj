@@ -248,7 +248,19 @@
             @foreach ($books as $item)
                 <article class="record-card">
                     <div class="card-header">
-                        <span class="badge">Книга</span>
+                        @if($item->edition_types->isNotEmpty())
+                            <div class="type-badge-container">
+                                <span class="type-label">{{ $translates['type_of_publication'] ?? 'Тип видання:' }}</span>
+                                <div class="badges-list">
+                                    @foreach($item->edition_types as $type)
+                                        @php
+                                            $typeTranslation = $type->translates->firstWhere('lang', app()->getLocale());
+                                        @endphp
+                                        <span class="badge badge-type">{{ $typeTranslation->name ?? '—' }}</span>
+                                    @endforeach
+                                </div>
+                            </div>
+                         @endif
                     {{-- <div class="card-actions">
                         <button class="btn-icon">Cite</button>
                         <button class="btn-icon">Export</button>
@@ -259,7 +271,14 @@
                     </h3>
                     {{-- <p class="record-author">Петренко О. В., 2024</p> --}}
                     {{-- <p class="record-details">Видавництво: Дух і Літера | DOI: 10.1234/jsiu.2024.01</p> --}}
-
+                    @if($item->authors->isNotEmpty())
+                        <div class="book-author">
+                            <strong>{{ $translates['author'] ?? 'Автор' }}:</strong>
+                            @foreach($item->authors as $author)
+                                {{ $author->translates[app()->getLocale()]->name ?? $author->translates->first()->name ?? '' }}@if(!$loop->last), @endif
+                            @endforeach
+                        </div>
+                    @endif
                     <div class="record-tags">
                         @php
                             // 1. Получаем текущие ID тегов из URL (разделитель - дефис)

@@ -283,13 +283,26 @@ class SearchController extends Controller
     }
 
     // Получаем результат (distinct нужен, чтобы избежать дублей из-за JOIN/whereHas)
-    $books = $query->with('translates', 'tags.translates')->distinct()->get();
+    $books = $query->with([
+        'translates', 
+        'tags.translates',
+        'char_vals.characteristic', 
+        'char_vals.translates'
+    ])->distinct()->get();
 
     $books->each(function($b) {
         $b->setRelation('translates', $b->translates->keyBy('lang'));
     
         $b->tags->each(function($tag) {
             $tag->setRelation('translates', $tag->translates->keyBy('lang'));
+        });
+
+        $b->authors = $b->char_vals->filter(function($val) {
+            return optional($val->characteristic)->is_author == 1;
+        });
+    
+        $b->edition_types = $b->char_vals->filter(function($val) {
+            return optional($val->characteristic)->is_type == 1;
         });
     });
 

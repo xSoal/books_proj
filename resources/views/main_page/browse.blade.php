@@ -80,14 +80,15 @@
                 @endphp
                 <article class="browse-card">
                     <div class="card-image">
-                        @if($item->image)
-                            <img src="{{ asset('storage/' . $item->image) }}" alt="{{ $translate->name }}">
-                        @else
-                            <div class="card-placeholder">
-                                <span>{{ mb_substr($translate->name, 0, 1) }}</span>
-                            </div>
-                        @endif
-                        {{-- <span class="card-badge">{{ $item->type ?? 'Книга' }}</span> --}}
+                        <a href="{{ route('book', ['slug' => $translate->slug]) }}">
+                            @if($item->img)
+                                <img src="{{ $item->img }}" alt="{{ $translate->name }}" loading="lazy">
+                            @else
+                                <div class="card-placeholder">
+                                    <span>{{ mb_substr($translate->name, 0, 1) }}</span>
+                                </div>
+                            @endif
+                        </a>
                     </div>
 
                     <div class="card-content">
@@ -97,13 +98,8 @@
                             </a>
                         </h3>
                         
-                        {{-- <p class="card-author">
-                            {{ $item->author ?? 'Автор не вказаний' }} 
-                            @if($item->year) <span class="card-year">({{ $item->year }})</span> @endif
-                        </p> --}}
-
                         <p class="card-excerpt">
-                            {{ Str::limit($item->translates[app()->getLocale()]->anotation ?? $translates['have_not_anotation'], 150) }}
+                            {{ Str::limit($translate->anotation ?? $translates['have_not_anotation'], 120) }}
                         </p>
 
                         <div class="card-footer">
