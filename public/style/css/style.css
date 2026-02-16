@@ -213,7 +213,6 @@ textarea:focus-visible {
     background-color: var(--color-cream);
     display: flex;
     flex-direction: column;
-    /* transition: none; — полностью исключаем анимации */
 }
 
 /* Контейнер для логотипа */
@@ -231,7 +230,6 @@ textarea:focus-visible {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
-    /* Убираем фильтры и прозрачность для статичного вида */
     filter: none;
     opacity: 1;
 }
@@ -293,7 +291,7 @@ textarea:focus-visible {
 /* Контейнер для форми пошуку знизу */
 .bottom-search-container {
     padding: 30px;
-    background-color: var(--color-beige); /* Світло-бежевий фон для виділення зони */
+    background-color: var(--color-beige);
     border: 1px solid var(--color-beige);
 }
 
@@ -304,12 +302,12 @@ textarea:focus-visible {
 
 .search-input-wrapper {
     display: flex;
-    gap: 10px; /* Відступ між полем та кнопкою */
+    gap: 10px;
 }
 
 /* Поле введення */
 .bottom-search-field {
-    flex: 1; /* Поле займає весь доступний простір */
+    flex: 1;
     padding: 12px 20px;
     font-family: inherit;
     font-size: 1rem;
@@ -326,8 +324,8 @@ textarea:focus-visible {
 /* Кнопка пошуку */
 .btn-bottom-search {
     padding: 0 30px;
-    height: auto; /* Вирівнювання по висоті з input */
-    border-radius: 0; /* Академічний строгий стиль */
+    height: auto;
+    border-radius: 0;
     white-space: nowrap;
 }
 
@@ -357,7 +355,6 @@ textarea:focus-visible {
 }
 
 .feed-back-book {
-    /* max-width: 500px; */
 }
 
 .form-wrapper {
@@ -418,7 +415,7 @@ textarea:focus-visible {
 
 /* Оверлей модального вікна */
 .modal-overlay {
-    display: none; /* Приховано за замовчуванням */
+    display: none;
     position: fixed;
     top: 0;
     left: 0;
@@ -504,15 +501,15 @@ textarea:focus-visible {
 /* Стилізація текстового поля у формі зворотного зв'язку */
 textarea.feed_back_textArea {
     width: 100%;
-    min-height: 120px; /* Мінімальна висота для зручності тексту */
+    min-height: 120px;
     padding: 12px 15px;
-    font-family: inherit; /* Використовує основний шрифт сайту */
+    font-family: inherit;
     font-size: 0.95rem;
     color: var(--color-dark-brown);
-    background-color: var(--color-cream); /* Світлий фон */
+    background-color: var(--color-cream);
     border: 1px solid var(--color-beige);
-    border-radius: 0; /* Строгий академічний стиль */
-    resize: vertical; /* Дозволяємо змінювати розмір лише по вертикалі */
+    border-radius: 0;
+    resize: vertical;
     line-height: 1.5;
     margin-bottom: 5px;
 }
@@ -570,13 +567,13 @@ textarea.feed_back_textArea::placeholder {
     }
     
     .partner-card {
-        flex: 1 1 calc(50% - 1.5rem); /* 2 в ряд на планшетах */
+        flex: 1 1 calc(50% - 1.5rem);
     }
 }
 
 @media (max-width: 480px) {
     .partner-card {
-        flex: 1 1 100%; /* 1 в ряд на смартфонах */
+        flex: 1 1 100%;
     }
     
     .form-wrapper {
@@ -649,8 +646,8 @@ textarea.feed_back_textArea::placeholder {
     color: var(--color-dark-brown);
     background-color: var(--color-white);
     border: 1px solid var(--color-beige);
-    border-radius: 0; /* Строгий академический стиль без скруглений */
-    transition: none; /* Без анимаций, согласно вашему запросу */
+    border-radius: 0;
+    transition: none;
     cursor: pointer;
 }
 
@@ -861,7 +858,7 @@ input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     height: 18px;
     width: 18px;
-    background-color: var(--color-accent-brown); /* Акцент из вашего списка */
+    background-color: var(--color-accent-brown);
     cursor: pointer;
     border-radius: 50%;
     pointer-events: auto;
@@ -870,7 +867,7 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 input[type="range"]:focus::-webkit-slider-thumb {
-    outline: 2px solid var(--color-focus); /* Цвет фокуса из списка */
+    outline: 2px solid var(--color-focus);
 }
 
 /* Блок с текстовыми значениями под слайдером */
@@ -1380,7 +1377,7 @@ input:focus, select:focus {
 }
 
 .browse-card {
-    flex: 1 1 calc(33.333% - 25px); /* 3 в ряд */
+    flex: 1 1 calc(33.333% - 25px);
     min-width: 300px;
     background: var(--color-white);
     border: 1px solid var(--color-beige);
@@ -1592,9 +1589,8 @@ input:focus, select:focus {
 
 .book-placeholder {
     width: 100%;
-    /* Задаємо фіксовану пропорцію для блоку (наприклад, 3:4), але картинка всередині підлаштується */
     aspect-ratio: 3 / 4; 
-    background-color: var(--color-beige); /* */
+    background-color: var(--color-beige);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1605,12 +1601,8 @@ input:focus, select:focus {
 .book-cover-img {
     width: 100%;
     height: 100%;
-    /* object-fit: contain гарантує, що картинка не обріжеться, навіть якщо вона панорамна або квадратна */
     object-fit: contain;
-    /* Якщо хочете, щоб картинка завжди заповнювала блок (можлива обрізка країв): використовуйте cover */
-    /* object-fit: cover; */
-    
-    background-color: var(--color-cream); /* Світлий фон навколо картинки, якщо вона не на весь блок */
+    background-color: var(--color-cream);
 }
 
 .book-placeholder span {
