@@ -20,5 +20,11 @@ class CharacteristicValue extends Model
         return $this->hasMany(CharacteristicValueTranslate::class, 'char_val_id', 'id');
     }
 
+    public function characteristic()
+    {
+        // Укажите правильный внешний ключ, если он отличается от characteristic_id
+        return $this->belongsTo(Characteristic::class, 'characteristic_id');
+    }
+
 
 }

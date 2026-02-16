@@ -17,7 +17,9 @@ class Characteristic extends Model
         'sort',
         'in_filter',
         'is_numeric',
-        'can_sorted_by'
+        'can_sorted_by',
+        'is_author',
+        'is_type',
     ];
 
     public function translates(){

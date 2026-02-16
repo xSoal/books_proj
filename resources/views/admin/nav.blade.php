@@ -13,6 +13,10 @@
     <div class="in_admin_menu">
 
         <div class="admin_menu_link">
+            <a href="{{ route('admin') }}" class="menu_link_item users_list">Головна</a>
+        </div>
+
+        <div class="admin_menu_link">
             <a href="{{ route('admin.books') }}" class="menu_link_item users_list">Книги</a>
         </div>
 

@@ -192,6 +192,48 @@
                 </div>
             </div>
 
+            <div class="form_block can_sorted_by">
+                <div class="fb_inside">
+                    <div class="fb_label">
+                        <div class="fb_label_inside">
+                            <label for="is_author">Динамічне поле "Автор"</label>
+                        </div>
+                    </div>
+                    <div class="fb_input input_toggle">
+                        <div class="fb_input_inside">
+                            <input type="hidden" name="is_author" id="is_author" value="{{ $item->is_author ?? 1 }}">
+                            <div class="toggle {{ isset($item) ? 
+                                                    $item->is_author === 1 ? 'active' : '' 
+                                                    : 'active'
+                                                }}">
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form_block can_sorted_by">
+                <div class="fb_inside">
+                    <div class="fb_label">
+                        <div class="fb_label_inside">
+                            <label for="is_type">Динамічне поле "Тип видання"</label>
+                        </div>
+                    </div>
+                    <div class="fb_input input_toggle">
+                        <div class="fb_input_inside">
+                            <input type="hidden" name="is_type" id="is_type" value="{{ $item->is_type ?? 1 }}">
+                            <div class="toggle {{ isset($item) ? 
+                                                    $item->is_type === 1 ? 'active' : '' 
+                                                    : 'active'
+                                                }}">
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="form_block">
                 <div class="fb_inside">
                     <div class="fb_label">

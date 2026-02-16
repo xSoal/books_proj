@@ -5,70 +5,80 @@ namespace App\Http\Controllers\MainPage;
 use App\Http\Controllers\Controller;
 use App\Models\Book;
 use App\Models\Characteristic;
+use App\Models\UserActivity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class BookController extends Controller
 {
-    //
-
     public function index(Request $request, $slug)
     {
         $book = Book::whereHas('translates', function ($query) use ($slug) {
             $query->where('slug', $slug);
-        })->with('translates')->first();
+        })->with([
+            'translates', 
+            'tags.translates', 
+            'char_vals.characteristic.translates', // Нужно для определения автора
+            'char_vals.translates'
+        ])->firstOrFail();
+
+        $locale = app()->getLocale();
 
         $book->setRelation('translates', $book->translates->keyBy('lang'));
+        $book->tags->each(function ($tag) use ($locale) {
+            $tag->setRelation('translates', $tag->translates->keyBy('lang'));
+        });
 
-        $locale = app()->getLocale();
-
-       
-        // TODO сократить запросы
-
-        $book_char_vals_id = DB::table('books_char_val')
-            ->where('book_id', $book->id)
-            ->get();
-
-        
-        $char_val_ids = DB::table('books_char_val')
-            ->where('book_id', $book->id)
-            ->pluck('char_val_id')
-            ->toArray();           
-
-        $chars_id = DB::table('char_vals')
-            ->whereIn('id', $char_val_ids)
-            ->pluck('characteristic_id') 
-            ->toArray();    
+        $chars = $book->char_vals->groupBy('characteristic_id')->map(function ($vals) use ($locale) {
+            $characteristic = $vals->first()->characteristic;
+            $characteristic->setRelation('translates', $characteristic->translates->keyBy('lang'));
             
-        $chars = Characteristic::whereIn('id', $chars_id)
-            ->with(['translates', 'char_vals' => function($query) use ($char_val_ids) {
-                $query->whereIn('id', $char_val_ids) 
-                    ->with('translates');
-            }])
-            ->get()
-            ;
-
-        $chars->each(function ($char) {
-            $char->setRelation('translates', $char->translates->keyBy('lang'));
-
-            $char->char_vals->each(function ($value) {
-                $value->setRelation('translates', $value->translates->keyBy('lang'));
+            $vals->each(function ($v) use ($locale) {
+                $v->setRelation('translates', $v->translates->keyBy('lang'));
             });
-        });    
-    
+            
+            $characteristic->setRelation('char_vals', $vals);
+            return $characteristic;
+        });
 
-    // $grouped = $chars->groupBy('char_name');
+        $authorValue = $book->char_vals->first(function ($val) {
+            return $val->characteristic && $val->characteristic->is_author == 1;
+        });
 
-        $locale = app()->getLocale();
+
+        $otherBooks = collect();
+
+        if ($authorValue) {
+            $otherBooks = Book::where('books.id', '!=', $book->id)
+                ->where('books.active', 1)
+                ->whereHas('char_vals', function ($q) use ($authorValue) {
+                    $q->where('char_vals.id', $authorValue->id);
+                })
+                ->with('translates')
+                ->limit(25)
+                ->get();
+
+            $otherBooks->each(fn($b) => $b->setRelation('translates', $b->translates->keyBy('lang')));
+        }
+
+
         $translates = DB::table('translates')->pluck($locale, 'slug');
 
-        $data = [
-            'title' => 'Book',
-            'book' => $book,
-            'chars' => $chars,
-            'translates' => $translates
-        ];
 
-        return view('main_page.book', $data);
+        // Логи
+        UserActivity::create([
+            'type' => 'view',
+            'book_id' => $book->id,
+            'locale' => app()->getLocale(),
+            'user_ip' => $request->ip()
+        ]);
+
+        return view('main_page.book', [
+            'title' => $book->translates[$locale]->name ?? 'Book',
+            'book' => $book,
+            'chars' => $chars, // Передаем сгруппированные характеристики
+            'translates' => $translates,
+            'otherBooks' => $otherBooks
+        ]);
     }
 }

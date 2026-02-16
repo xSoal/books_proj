@@ -3,8 +3,98 @@ $(document).ready(function () {
   initFilter();
   initSorting();
   initInputRange();
-
+  initSwiper();
+  initSearchButton();
+  initPopup();
 });
+
+function initPopup(params) {
+  var modal = document.querySelector('#feedbackModal');
+  var openBtn = document.querySelector('.btn-feedback-trigger');
+  var closeBtn = document.querySelector('.modal-close');
+
+  function toggleFeedbackModal(show) {
+      if (!modal) return;
+      
+          if (show) {
+              modal.style.display = 'flex';
+              document.body.style.overflow = 'hidden';
+          } else {
+              modal.style.display = 'none';
+              document.body.style.overflow = '';
+          }
+      }
+
+      if (openBtn) {
+          openBtn.addEventListener('click', () => toggleFeedbackModal(true));
+      }
+
+      if (closeBtn) {
+          closeBtn.addEventListener('click', () => toggleFeedbackModal(false));
+      }
+
+      if (modal) {
+          modal.addEventListener('click', function(e) {
+              if (e.target === modal) toggleFeedbackModal(false);
+          });
+      }
+
+      document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape') toggleFeedbackModal(false);
+      });
+
+    
+}
+
+
+
+function initSearchButton () {
+  document.addEventListener('submit', function (e) {
+    var form = e.target;
+    if(!form.classList.contains('searchForm')){
+      return;
+    }
+    
+    if (form.getAttribute('action') && form.getAttribute('action').includes('/search')) {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+      const params = new URLSearchParams();
+
+      formData.forEach((value, key) => {
+          if (value && value.trim() !== '') {
+              params.append(key, value);
+          }
+      });
+
+      const baseUrl = form.getAttribute('action');
+      const queryString = params.toString();
+
+      const finalUrl = queryString ? `${baseUrl}?${queryString}` : baseUrl;
+
+      window.location.href = finalUrl;
+    }
+});
+}
+
+function initSwiper(){
+  if(!$('.author-works-swiper').length) return;
+  var swiperAuthor = new Swiper('.author-works-swiper', {
+    direction: 'vertical',
+    slidesPerView: 3,
+    spaceBetween: 10,
+    slidesPerGroup: 3,
+    navigation: {
+        nextEl: '.next-author',
+        prevEl: '.prev-author',
+    },
+    pagination: {
+        el: '.swiper-pagination-custom',
+        type: 'fraction',
+    },
+    watchOverflow: true,
+});
+}
 
 function initInputRange(){
   var inputsRange = $('.input__numericRange').toArray();

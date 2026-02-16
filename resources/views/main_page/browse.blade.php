@@ -52,16 +52,16 @@
 <div class="container main-layout browse-page"> 
     <main class="content">
         <div class="results-header">
-            <div class="results-count">Знайдено записів: {{ $books->total() }}</div>
+            <div class="results-count">{{ $translates['records_found'] }} {{ $books->total() }}</div>
             <div class="sorting-controls">
-                <label for="sort">Сортувати за:</label>
+                <label for="sort">{{ $translates['sort_by'] }}</label>
                 <?php
                     $sortOptions = [
-                        'name-asc' => 'Алфавітом',
+                        'name-asc' => $translates['sort_by_title'],
                     ];
                 ?>
                 <select id="sort">
-                    <option value="">За замовчуванням</option>
+                    <option value="">{{ $translates['sort_by_default'] }}</option>
                     @foreach ($sortOptions as $key => $value)
                         <option value="{{ $key }}" {{ request('order') === $key ? 'selected' : ''}}>{{ $value }}</option>
                     @endforeach
@@ -107,7 +107,7 @@
                         </p>
 
                         <div class="card-footer">
-                            <a href="{{ route('book', ['slug' => $translate->slug]) }}" class="btn-more">Читати далі →</a>
+                            <a href="{{ route('book', ['slug' => $translate->slug]) }}" class="btn-more">{{ $translates['read_more'] }} →</a>
                         </div>
                     </div>
                 </article>

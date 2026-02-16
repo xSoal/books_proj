@@ -5,19 +5,19 @@
 
 <main class="auth-container">
     <div class="auth-card">
-        <h1 class="auth-title">Вхід до системи</h1>
-        <p class="auth-subtitle">Тільки для адміністраторів та редакторів проєкту</p>
+        <h1 class="auth-title">{{ $translates['login_to_system'] }}</h1>
+        <p class="auth-subtitle">{{ $translates['for_admins_only'] }}</p>
         
         <form action="{{ route('login') }}" class="auth-form" method="post">
             @csrf
             <div class="form-group">
-                <label for="email">Електронна пошта</label>
-                <input type="email" id="email" name="email" required placeholder="example@mail.com">
+                <label for="email">{{ $translates['contact_email'] }}</label>
+                <input type="email" id="email" name="email" required placeholder="{{ $translates['contact_email'] }}">
             </div>
 
             <div class="form-group">
-                <label for="password">Пароль</label>
-                <input type="password" id="password" name="password" required placeholder="••••••••">
+                <label for="password">{{ $translates['password'] }}</label>
+                <input type="password" id="password" name="password" required placeholder="{{ $translates['password'] }}">
             </div>
 
             {{-- <div class="auth-options">
@@ -27,7 +27,7 @@
                 <a href="#" class="forgot-link">Забули пароль?</a>
             </div> --}}
 
-            <button type="submit" class="btn-login">Увійти</button>
+            <button type="submit" class="btn-login">{{ $translates['log_in'] }}</button>
         </form>
     </div>
 </main>

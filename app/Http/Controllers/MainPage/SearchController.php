@@ -11,6 +11,7 @@ use App\Models\CharacteristicValue;
 
 
 use App\Models\News;
+use App\Models\UserActivity;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -24,6 +25,7 @@ class SearchController extends Controller
 {
     $chars = Characteristic::where('need_approve', 0)
         // ->where('is_numeric', 0)
+        ->where('in_filter', 1)
         ->whereExists(function ($query) {
             $query->select(DB::raw(1))
                 ->from('books_char_val')
@@ -202,6 +204,15 @@ class SearchController extends Controller
         }
     }
 
+    // теги через get
+    if ($request->filled('tag')) {
+        $tagIds = explode('-', $request->query('tag'));
+        
+        $query->whereHas('tags', function($q) use ($tagIds) {
+            $q->whereIn('tags.id', $tagIds);
+        });
+    }
+
 
     // поиска
     if ($request->filled('search')) {
@@ -272,9 +283,34 @@ class SearchController extends Controller
     }
 
     // Получаем результат (distinct нужен, чтобы избежать дублей из-за JOIN/whereHas)
-    $books = $query->with('translates')->distinct()->get();
+    $books = $query->with('translates', 'tags.translates')->distinct()->get();
 
-    $books->each(fn($b) => $b->setRelation('translates', $b->translates->keyBy('lang')));
+    $books->each(function($b) {
+        $b->setRelation('translates', $b->translates->keyBy('lang'));
+    
+        $b->tags->each(function($tag) {
+            $tag->setRelation('translates', $tag->translates->keyBy('lang'));
+        });
+    });
+
+    $fullActivityLog = [
+        'url_filters' => $filters,
+        'get_params'  => $request->except(['page']),
+        'parsed_ids'  => $selected_char_vals_id, 
+        'ranges'      => $selected_input_range,  
+    ];
+
+    // Проверяем, было ли хоть какое-то действие (поиск или фильтрация)
+    if ($request->anyFilled(['search', 'tag', 'order']) || !empty($filters)) {
+        UserActivity::create([
+            'type'          => 'search',
+            'search_query'  => $request->query('search'), 
+            'filters'       => $fullActivityLog,
+            'results_count' => $books->count(), // Для коллекции count
+            'locale'        => app()->getLocale(),
+            'user_ip'       => $request->ip()
+        ]);
+    }
 
     $locale = app()->getLocale();
     $translates = DB::table('translates')->pluck($locale, 'slug');

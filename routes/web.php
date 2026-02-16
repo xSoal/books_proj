@@ -43,12 +43,14 @@ Route::group(['prefix' => 'api', 'middleware' => 'web'], function () {
 Route::group(['prefix' => '/admin', 'middleware' => 'auth'], function() {
 
 
-    Route::get('/',function(){
-        $data = [
-            'title' => 'Особистий кабінет',
-        ];
-        return view('admin.index',$data);
-    });
+    // Route::get('/',function(){
+    //     $data = [
+    //         'title' => 'Особистий кабінет',
+    //     ];
+    //     return view('admin.index', $data);
+    // });
+
+    Route::get('/', ['uses' => '\App\Http\Controllers\Admin\StatisticsController@index', 'as' => 'admin']);
 
 
     Route::group(['prefix' => 'users'], function () {

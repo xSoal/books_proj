@@ -44,7 +44,7 @@
 
 <div class="container main-layout filter">
     <aside class="sidebar">
-        <h2 class="sidebar-title">Фільтри</h2>
+        <h2 class="sidebar-title">{{ $translates['filters'] }}</h2>
 
 
         <form method="get" action="{{ route('search') }}" class="filter-form">
@@ -195,23 +195,23 @@
                 </div>
             </div> --}}
             <div class="filter__resetCont">
-                <a type="reset" class="btn-reset" href="{{ route('search') }}">Скинути фільтри</a>
+                <a type="reset" class="btn-reset" href="{{ route('search') }}">{{ $translates['reset_filters'] }}</a>
             </div>
         </form>
     </aside>
 
     <main class="content">
         <div class="results-header">
-            <div class="results-count">Знайдено записів: {{ count($books) }}</div>
+            <div class="results-count">{{ $translates['records_found'] }} {{ count($books) }}</div>
             <div class="sorting-controls">
-                <label for="sort">Сортувати за:</label>
+                <label for="sort">{{ $translates['sort_by'] }}</label>
                 <?php
                     $sortOptions = [
-                        'name-asc' => 'Алфавітом',
+                        'name-asc' => $translates['sort_by_title'],
                     ];
                 ?>
                 <select id="sort">
-                    <option value="">За замовчуванням</option>
+                    <option value="">{{ $translates['sort_by_default'] }}</option>
                     @foreach ($sortOptions as $key => $value)
                         <option value="{{ $key }}" {{ request('order') === $key ? 'selected' : ''}}>{{ $value }}</option>
                     @endforeach
@@ -223,7 +223,7 @@
         </div>
 
         <div class="bottom-search-container">
-            <form action="{{ url()->current() }}" method="GET" class="inline-search-form">
+            <form action="{{ url()->current() }}" method="GET" class="inline-search-form searchForm">
                 
                 @foreach(request()->except(['search', 'page']) as $key => $value)
                     <input type="hidden" name="{{ $key }}" value="{{ $value }}">
@@ -259,11 +259,62 @@
                     </h3>
                     {{-- <p class="record-author">Петренко О. В., 2024</p> --}}
                     {{-- <p class="record-details">Видавництво: Дух і Літера | DOI: 10.1234/jsiu.2024.01</p> --}}
+
                     <div class="record-tags">
-                        <span class="tag">Тут будуть теги</span>
-                        <span class="tag">Бібліографія</span>
-                        <span class="tag">Незалежна Україна</span>
+                        @php
+                            // 1. Получаем текущие ID тегов из URL (разделитель - дефис)
+                            $currentTags = request()->filled('tag') 
+                                ? array_filter(explode('-', request()->query('tag'))) 
+                                : [];
+                                
+                            // Приводим все ID к строкам для корректного сравнения
+                            $currentTags = array_map('strval', $currentTags);
+                        @endphp
+                    
+                        @foreach($item->tags as $tag)
+                            @php
+                                $tagName = $tag->translates[app()->getLocale()]->name ?? null;
+                                $tagId = (string)$tag->id;
+                                
+                                $isSelected = in_array($tagId, $currentTags);
+                                
+                                if ($isSelected) {
+                                    $newTagsArray = array_diff($currentTags, [$tagId]);
+                                } else {
+                                    $newTagsArray = array_merge($currentTags, [$tagId]);
+                                }
+                                
+                                $allParams = request()->query(); 
+                    
+                                if (!empty($newTagsArray)) {
+                                    $allParams['tag'] = implode('-', $newTagsArray);
+                                } else {
+                                    unset($allParams['tag']);
+                                }
+                    
+                                unset($allParams['page']);
+                    
+                                if (empty($allParams)) {
+                                    $tagUrl = request()->url();
+                                } else {
+                                    $tagUrl = request()->url() . '?' . rawurldecode(http_build_query($allParams));
+                                }
+                            @endphp
+                            
+                            @if($tagName)
+                                <a href="{{ $tagUrl }}" 
+                                   class="tag {{ $isSelected ? 'active' : '' }}"
+                                   title="{{ $isSelected ? $translates['choice_cancel'] : $translates['select_tag'] }}">
+                                    {{ $tagName }}
+                                    
+                                    @if($isSelected) 
+                                        <span class="remove-tag" aria-hidden="true">&times;</span> 
+                                    @endif
+                                </a>
+                            @endif
+                        @endforeach
                     </div>
+
                 </article>
             @endforeach
 
