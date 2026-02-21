@@ -4,14 +4,16 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="/favicon.ico" type="image/svg+xml">
+    
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon32.ico') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon32.ico') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('favicon180.ico') }}">
 
     {{-- <meta name="description" content="{{ $meta_decs ?? '' }}"> --}}
     
     <link rel="canonical" href="{{ Request::url() }}" />
 
 
-    <link rel="icon" type="image/png"  href='/images/favicon.svg'>
     
     
     {{-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous"> --}}
