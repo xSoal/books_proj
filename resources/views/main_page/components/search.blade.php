@@ -10,6 +10,16 @@
             </div>
     </form> --}}
 
-    <form class="searchForm" action="/search">
-        <input type="text" name="search" placeholder="Search" value="{{ isset($search) ? $search : '' }}">
+    <form class="searchForm mp-searchForm" action="{{ route('search') }}" method="GET" role="search">
+        <div class="search-input-wrapper">
+            <input
+                type="text"
+                name="search"
+                class="bottom-search-field"
+                placeholder="Search"
+                value="{{ isset($search) ? $search : '' }}"
+                aria-label="Search"
+            >
+            <button type="submit" class="btn btn-primary btn-bottom-search">Search</button>
+        </div>
     </form>

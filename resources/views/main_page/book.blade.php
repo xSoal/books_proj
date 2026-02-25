@@ -6,9 +6,11 @@
 <script src="{{ asset('js/swiper-bundle.min.js') }}"></script>
 
 
-<main class="container">
-    <a href="{{ route('search') }}" class="back-link">← {{ $translates['to_search'] }}</a>
-    <a href="{{ route('browse') }}" class="back-link">← {{ $translates['to_browse'] }}</a>
+<main id="main-content" class="container">
+    <nav class="back-links" aria-label="{{ $translates['navigation'] ?? 'Навігація' }}">
+        <a href="{{ route('search') }}" class="back-link">← {{ $translates['to_search'] }}</a>
+        <a href="{{ route('browse') }}" class="back-link">← {{ $translates['to_browse'] }}</a>
+    </nav>
 
     <div class="record-main-container">
         <div class="record-visual">
@@ -173,11 +175,11 @@
             </div>
         </aside> --}}
     </div>
-    <div id="feedbackModal" class="modal-overlay">
-        <div class="modal-content">
+    <div id="feedbackModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="feedbackModalTitle" aria-hidden="true">
+        <div class="modal-content" tabindex="-1">
             <div class="modal-header">
-                <h3 class="modal-title"{{ $translates['contact_us'] }}</h3>
-                <button type="button" class="modal-close">&times;</button>
+                <h3 id="feedbackModalTitle" class="modal-title">{{ $translates['contact_us'] }}</h3>
+                <button type="button" class="modal-close" aria-label="{{ $translates['close'] ?? 'Закрити' }}">&times;</button>
             </div>
             
             <form action="#" method="POST" class="feedback-form">
@@ -185,7 +187,7 @@
                 <input type="hidden" name="book_id" value="{{ $book->id }}">
                 <div class="form-group">
                     <label for="email">{{ $translates['contact_email'] }}</label>
-                    <input type="email" id="email" name="email" required class="form-control" placeholder="{{ $translates['contact_email'] }}">
+                    <input type="email" id="email" name="email" required autocomplete="email" class="form-control" placeholder="{{ $translates['contact_email'] }}">
                 </div>
                 <div class="form-group">
                     <label>{{ $translates['about_book'] }}</label>
@@ -193,7 +195,7 @@
                 </div>
                 <div class="form-group">
                     <label for="message">{{ $translates['message'] }}</label>
-                    <textarea class="feed_back_textArea" name="message" id="" cols="30" rows="10" placeholder="{{ $translates['message'] }}"></textarea>
+                    <textarea class="feed_back_textArea" name="message" id="message" rows="8" placeholder="{{ $translates['message'] }}"></textarea>
                 </div>
                 <button type="submit" class="btn-submit-feedback">{{ $translates['contact_send_message'] }}</button>
             </form>

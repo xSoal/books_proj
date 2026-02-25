@@ -174,8 +174,13 @@
     
                         ?>
                         <label>
-                            <a href="{{ $url_for_input }}">
-                                <input type="checkbox" data-slug="{{ $current_val_slug }}" {{ $selected ? 'checked' : '' }} style="pointer-events: none;">
+                            <a
+                                href="{{ $url_for_input }}"
+                                role="checkbox"
+                                aria-checked="{{ $selected ? 'true' : 'false' }}"
+                                aria-label="{{ ($selected ? ($translates['choice_cancel'] ?? 'Remove filter') : ($translates['select_filter'] ?? 'Select filter')) . ': ' . ($char_val->translates[app()->getLocale()]->name ?? '') }}"
+                            >
+                                <span class="mp-checkbox" aria-hidden="true"></span>
                                 {{ $char_val->translates[app()->getLocale()]->name }}
                             </a>
                         </label>
@@ -195,12 +200,12 @@
                 </div>
             </div> --}}
             <div class="filter__resetCont">
-                <a type="reset" class="btn-reset" href="{{ route('search') }}">{{ $translates['reset_filters'] }}</a>
+                <a class="btn-reset" href="{{ route('search') }}">{{ $translates['reset_filters'] }}</a>
             </div>
         </form>
     </aside>
 
-    <main class="content">
+    <main id="main-content" class="content">
         <div class="results-header">
             <div class="results-count">{{ $translates['records_found'] }} {{ count($books) }}</div>
             <div class="sorting-controls">
@@ -210,7 +215,7 @@
                         'name-asc' => $translates['sort_by_title'],
                     ];
                 ?>
-                <select id="sort">
+                <select id="sort" aria-label="{{ $translates['sort_by'] }}">
                     <option value="">{{ $translates['sort_by_default'] }}</option>
                     @foreach ($sortOptions as $key => $value)
                         <option value="{{ $key }}" {{ request('order') === $key ? 'selected' : ''}}>{{ $value }}</option>

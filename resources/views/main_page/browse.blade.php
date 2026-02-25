@@ -50,7 +50,7 @@
 
 
 <div class="container main-layout browse-page"> 
-    <main class="content">
+    <main id="main-content" class="content">
         <div class="results-header">
             <div class="results-count">{{ $translates['records_found'] }} {{ $books->total() }}</div>
             <div class="sorting-controls">
@@ -60,7 +60,7 @@
                         'name-asc' => $translates['sort_by_title'],
                     ];
                 ?>
-                <select id="sort">
+                <select id="sort" aria-label="{{ $translates['sort_by'] }}">
                     <option value="">{{ $translates['sort_by_default'] }}</option>
                     @foreach ($sortOptions as $key => $value)
                         <option value="{{ $key }}" {{ request('order') === $key ? 'selected' : ''}}>{{ $value }}</option>

@@ -1,5 +1,5 @@
 
-	<a href="#main-content" class="skip-link">Перейти до основного змісту</a>
+	{{-- <a href="#main-content" class="skip-link">Перейти до основного змісту</a> --}}
 
     <header class="site-header">
         <div class="container header-flex">

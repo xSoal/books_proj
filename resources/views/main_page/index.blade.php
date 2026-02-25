@@ -10,9 +10,10 @@
 
 
 <main id="main-content">
-  <section class="hero-section" aria-labelledby="hero-title">
+  <section class="hero-section">
       <div class="container">
-          <div class="about_us">
+          <h1 class="section-title section-title--left">{{ $translates['home'] ?? 'Home' }}</h1>
+          <div class="about_us wysiwyg">
             {!! $about_us !!}
           </div>  
           <div class="cta-group">
@@ -51,9 +52,10 @@
       <div class="container">
           <div class="form-wrapper">
               <h2 id="feedback-title" class="section-title">{{ $translates['feedback'] }}</h2>
-              <p class="form-intro">{{ $translates['feedback_help_text'] }}</p>
+              <p class="form-intro" id="feedback-help">{{ $translates['feedback_help_text'] }}</p>
               
-              <form action="#" method="post" class="contact-form">
+              <form action="#" method="post" class="contact-form" aria-describedby="feedback-help">
+                  @csrf
                   <div class="field-group">
                       <label for="user-name">{{ $translates['contact_name'] }}</label>
                       <input type="text" id="user-name" name="name" required autocomplete="name">

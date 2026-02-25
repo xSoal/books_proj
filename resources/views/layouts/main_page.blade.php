@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -57,9 +57,10 @@
 
 </head>
 <body class="site helix-ultimate hu com_sppagebuilder com-sppagebuilder view-page layout-default task-none itemid-101 uk-ua ltr sticky-header layout-fluid offcanvas-init offcanvs-position-right">
+    {{-- <a class="skip-link" href="#main-content">Skip to main content</a> --}}
     
     @if( count($errors) > 0 )
-        <div class="error">
+        <div class="error" role="alert" aria-live="assertive">
             <ul>
                 @foreach($errors->all() as $error)
                     <li>{{$error}}</li>
@@ -69,7 +70,7 @@
     @endif
 
     @if( session('status') )
-        <div class="session_stat">
+        <div class="session_stat" role="status" aria-live="polite">
             {{ session('status') }}
         </div>
     @endif
