@@ -24,35 +24,35 @@ class SeoController extends Controller
         return view('admin.seo.edit', $data);
     }
 
-    public function edit(Request $request){
+    public function edit(Request $request)
+    {
         $input = $request->except('_token');
-        
-        $page = $input['page'];
-        unset($input['page']);
-        
-        $seo_json = DB::table('settings')
-            ->where('type', 'seo')
-            ->first();
-
-        if($seo_json){
-            $seo = json_decode($seo_json->value, true);
-            $seo[$page] = $input;
-        } else {
-            $seo = [
-                $page => $input
-            ];
-        }
-
-        $updated = DB::table('settings')->updateOrInsert(
+        $page = $request->input('page');
+    
+        $setting = DB::table('settings')->where('type', 'seo')->first();
+        $seo = $setting ? json_decode($setting->value, true) : [];
+    
+        $pageData = $request->only([
+            'meta_title', 'meta_description', 'meta_keywords', 'og_title', 'og_description'
+        ]);
+    
+        // Если в запросе есть 'img' и он не пустой — сохраняем его.
+        if ($request->filled('img')) {
+            $pageData['img'] = $request->input('img');
+        } 
+        // Если в запросе НЕТ 'img' (блок удален), но есть маркер img_container_exists,
+        // значит картинку специально удалили. В этом случае в $pageData ключа 'img' не будет.
+    
+        $seo[$page] = $pageData;
+    
+        DB::table('settings')->updateOrInsert(
+            ['type' => 'seo'],
             [
-                'type' => 'seo',
-            ],
-            [
-                'value' => json_encode($seo),
-                'updated_at' => now() 
+                'value' => json_encode($seo, JSON_UNESCAPED_UNICODE),
+                'updated_at' => now()
             ]
         );
-
+    
         return redirect()->route('admin.seo');
     }
 

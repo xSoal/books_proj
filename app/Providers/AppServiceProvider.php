@@ -30,7 +30,8 @@ class AppServiceProvider extends ServiceProvider
             LoginComposer::class
         );
 
-        // Переменная будет доступна только в шаблоне auth.login
+        
+
         View::composer('*', function ($view) {
             $locale = app()->getLocale();
             // $translates = cache()->rememberForever('translates_' . $locale, function() use ($locale) {
@@ -40,7 +41,20 @@ class AppServiceProvider extends ServiceProvider
 
             $view->with('translates', $translates);
         });
-        }
+
+        View::composer('*', function ($view) {
+            $routeName = request()->route()?->getName();
+
+            $global_seo = DB::table('settings')->where('type', 'seo')->first();
+            $global_seo = json_decode($global_seo->value, true)[$routeName] ?? null;
+
+            $view->with('global_seo', $global_seo);
+        });
+
+
+    }
+
+
 
 
 }

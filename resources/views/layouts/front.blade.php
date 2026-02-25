@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="{{ asset('/style/css/style.css') }}">
 
 
+
     <title>{{ $meta_title  ?? ''}}</title>
 </head>
 <body>

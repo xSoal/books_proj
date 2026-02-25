@@ -9,44 +9,46 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon32.ico') }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('favicon180.ico') }}">
 
-    {{-- <meta name="description" content="{{ $meta_decs ?? '' }}"> --}}
-    
     <link rel="canonical" href="{{ Request::url() }}" />
-
-
     
-    
-    {{-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous"> --}}
-    
-    {{-- <script src="https://kit.fontawesome.com/5370645651.js" crossorigin="anonymous"></script> --}}
     <link rel="stylesheet" href="{{asset('js/jquery-ui-1.13.1/jquery-ui.css')}}">
     
     <script src="{{ asset('/js/all.min.js') }}"></script>
 
-    {{-- <link rel="stylesheet" href="{{ asset('/style/css/old_styles.css') }}"> --}}
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    {{-- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"> --}}
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="{{ asset('/style/css/style.css') }}">
-    {{-- @if( isset($LoginTitle) )
-    <title>{{ $LoginTitle  ?? ''}}</title>
-    @else
-    <title>{{ $title  ?? ''}}</title>
-    @endif
-
     <meta name="robots" content="index, follow" />
-    <meta name="title" content="{{ $seo->meta_title ?? '' }}" />
-    <meta name="description" content="{{ $seo->meta_description ?? '' }}" />
-    <meta name="keywords" content="{{ $seo->meta_keywords ?? '' }}" />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="{{ $seo->og_title ?? '' }}" />
-    <meta property="og:description" content="{{ $seo->og_description ?? '' }}" />
-    <meta property="og:image" content="{{ isset($seo) && $seo->og_img !='' ? asset($seo->og_img) : '' }}" />
+
     <meta name="twitter:card" content="summary_large_image" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" /> --}}
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" /> 
+    <meta property="og:type" content="website" />
+
+    @if($global_seo)
+
+    <meta name="title" content="{{ $global_seo['meta_title'][app()->getLocale()] ?? '' }}" />
+    <title>{{ $global_seo['meta_title'][app()->getLocale()] ?? '' }}</title>
+    <meta name="description" content="{{ $global_seo['meta_description'][app()->getLocale()] ?? '' }}" />
+    <meta name="keywords" content="{{ $global_seo['meta_keywords'][app()->getLocale()] ?? '' }}" />
+    <meta property="og:title" content="{{ $global_seo['meta_title'][app()->getLocale()] ?? '' }}" />
+    <meta property="og:image" content="{{ isset($global_seo['img']) && $global_seo['img'] !='' ? asset($global_seo['img']) : '' }}" />
+    <meta property="og:description" content="{{ $global_seo['meta_description'][app()->getLocale()] ?? '' }}" />
+
+    @elseif(isset($local_seo))
+        <meta name="title" content="{{ $local_seo['meta_title'] ?? '' }}" />
+        <title>{{ $local_seo['meta_title'] ?? '' }}</title>
+        <meta name="description" content="{{ $local_seo['meta_description'] ?? '' }}" />
+        <meta name="keywords" content="{{ $local_seo['meta_keywords'] ?? '' }}" />
+        <meta property="og:title" content="{{ $local_seo['meta_title'] ?? '' }}" />
+        <meta property="og:image" content="{{ isset($local_seo['img']) && $local_seo['img'] !='' ? asset($local_seo['img']) : '' }}" />
+        <meta property="og:description" content="{{ $local_seo['meta_description'] ?? '' }}" />
+
+    @else
+        <title>Jewish Studies UA</title>
+    @endif
 
 </head>
 <body class="site helix-ultimate hu com_sppagebuilder com-sppagebuilder view-page layout-default task-none itemid-101 uk-ua ltr sticky-header layout-fluid offcanvas-init offcanvs-position-right">

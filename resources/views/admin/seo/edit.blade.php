@@ -17,7 +17,7 @@
 
     @php
         $languages = ['ua', 'en'];
-        $pages = ['main_page', 'search', 'aboute_us'];
+        $pages = ['main_page', 'search', 'about', 'browse'];
         $seo_tags = ['meta_title', 'meta_description', 'meta_keywords', 'og_title', 'og_description'];
     @endphp
         <div class="tabPagesHeaderCont">
@@ -80,16 +80,16 @@
                                                                 <button type="button" class="addPhotoBtn"></button>
                                                                 <input type="file" class="addPhoto" data-name="img" data-type="seo_images">
                                                                 <div class="photoPreview">
-                                                                    <?php
-                                                                        // dd($seo[$page]['img']);
-                                                                    ?>
-                                                                    @if( isset($seo[$page]) && isset($seo[$page]['img'])))
-                                                                    <div class="preview">
+                                                                    <input type="hidden" name="img_container_exists" value="1">
 
-                                                                        <img src="{{  $seo[$page]['img'] }}">
-                                                                        <div class="btn btn_del del_elem" onClick="this.parentNode.remove()"></div>
-                                                                        <input type="hidden" name="img" value="{{  $seo[$page]['img'] }}">
-                                                                    </div>
+                                                                    @if( isset($seo[$page]) && isset($seo[$page]['img']) )
+                                                                        <div class="preview">
+                                                                            <img src="{{ $seo[$page]['img'] }}">
+                                                                            {{-- При удалении просто убираем блок. Контроллер поймет, что инпута с таким именем больше нет --}}
+                                                                            <div class="btn btn_del del_elem" onClick="this.parentNode.remove()"></div>
+                                                                            {{-- Уникальное имя инпута для страницы --}}
+                                                                            <input type="hidden" name="{{ $page }}_img" value="{{ $seo[$page]['img'] }}">
+                                                                        </div>
                                                                     @endif
                                                                 </div>
                                                             </div>
@@ -118,244 +118,6 @@
 
         </div>
 
-        {{-- <form action="{{ route('admin.seoEdit') }}" method="POST">
-            {{ csrf_field() }} 
-            <input type="hidden" name="type" value="news">
-            <div class="select_bg"></div>
-
-            
-            <div class="project_doube_row">
-
-                <div class="project_left">
-
-                    
-                    <div class="form_block">
-                        <div class="fb_inside">
-                            <div class="fb_label">
-                                <div class="fb_label_inside">
-                                    <label for="meta_title">Meta title</label>
-                                </div>
-                            </div>
-                            <div class="fb_input">
-                                <div class="fb_input_inside">
-                                    <input type="text" name="meta_title" value="{{ $seo->meta_title ?? '' }}" required>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form_block">
-                        <div class="fb_inside">
-                            <div class="fb_label">
-                                <div class="fb_label_inside">
-                                    <label for="meta_description">Meta description</label>
-                                </div>
-                            </div>
-                            <div class="fb_input">
-                                <div class="fb_input_inside">
-                                    <input type="text" name="meta_description" value="{{ $seo->meta_description ?? '' }}" required>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form_block">
-                        <div class="fb_inside">
-                            <div class="fb_label">
-                                <div class="fb_label_inside">
-                                    <label for="meta_keywords">Meta Keywords</label>
-                                </div>
-                            </div>
-                            <div class="fb_input">
-                                <div class="fb_input_inside">
-                                    <input type="text" name="meta_keywords" value="{{ $seo->meta_keywords ?? '' }}">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form_block">
-                        <div class="fb_inside">
-                            <div class="fb_label">
-                                <div class="fb_label_inside">
-                                    <label for="og_title">Og title</label>
-                                </div>
-                            </div>
-                            <div class="fb_input">
-                                <div class="fb_input_inside">
-                                    <input type="text" name="og_title" value="{{ $seo->og_title ?? '' }}" required>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form_block">
-                        <div class="fb_inside">
-                            <div class="fb_label">
-                                <div class="fb_label_inside">
-                                    <label for="og_description">Og description</label>
-                                </div>
-                            </div>
-                            <div class="fb_input">
-                                <div class="fb_input_inside">
-                                    <input type="text" name="og_description" value="{{ $seo->og_description ?? '' }}" required>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <div class="form_block">
-                        <div class="fb_inside">
-                            <div class="fb_label">
-                                <div class="fb_label_inside">
-                                    <label for="image">Og img</label>
-                                </div>
-                            </div>
-                            <div class="fb_input">
-                                <div class="fb_input_inside">
-                                    <button type="button" class="addPhotoBtn"></button>
-                                    <input type="file" class="addPhoto" data-name="og_img">
-                                    <div class="photoPreview">
-                                        <div class="preview">
-                                            <img src="{{ $seo->og_img }}">
-                                            <div class="btn btn_del del_elem" onClick="this.parentNode.remove()"></div>
-                                            <input type="hidden" name="og_img" value="{{ $seo->og_img }}">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <h1>Titles:</h1>
-                    
-                    <div class="form_block">
-                        <div class="fb_inside">
-                            <div class="fb_label">
-                                <div class="fb_label_inside">
-                                    <label for="main">Головна</label>
-                                </div>
-                            </div>
-                            <div class="fb_input">
-                                <div class="fb_input_inside">
-                                    <input type="text" name="main" value="{{ $titles->main ?? '' }}" required>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form_block">
-                        <div class="fb_inside">
-                            <div class="fb_label">
-                                <div class="fb_label_inside">
-                                    <label for="news">Новини</label>
-                                </div>
-                            </div>
-                            <div class="fb_input">
-                                <div class="fb_input_inside">
-                                    <input type="text" name="news" value="{{ $titles->news ?? '' }}" required>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form_block">
-                        <div class="fb_inside">
-                            <div class="fb_label">
-                                <div class="fb_label_inside">
-                                    <label for="contacts">Контакты</label>
-                                </div>
-                            </div>
-                            <div class="fb_input">
-                                <div class="fb_input_inside">
-                                    <input type="text" name="contacts" value="{{ $titles->contacts ?? '' }}" required>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form_block">
-                        <div class="fb_inside">
-                            <div class="fb_label">
-                                <div class="fb_label_inside">
-                                    <label for="login">Login</label>
-                                </div>
-                            </div>
-                            <div class="fb_input">
-                                <div class="fb_input_inside">
-                                    <input type="text" name="login" value="{{ $titles->login ?? '' }}" required>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form_block">
-                        <div class="fb_inside">
-                            <div class="fb_label">
-                                <div class="fb_label_inside">
-                                    <label for="search">Пошук</label>
-                                </div>
-                            </div>
-                            <div class="fb_input">
-                                <div class="fb_input_inside">
-                                    <input type="text" name="search" value="{{ $titles->search ?? '' }}" required>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form_block">
-                        <div class="fb_inside">
-                            <div class="fb_label">
-                                <div class="fb_label_inside">
-                                    <label for="reference">Довідкова інформація</label>
-                                </div>
-                            </div>
-                            <div class="fb_input">
-                                <div class="fb_input_inside">
-                                    <input type="text" name="reference" value="{{ $titles->reference ?? '' }}" required>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form_block">
-                        <div class="fb_inside">
-                            <div class="fb_label">
-                                <div class="fb_label_inside">
-                                    <label for="support">Програма підтримки</label>
-                                </div>
-                            </div>
-                            <div class="fb_input">
-                                <div class="fb_input_inside">
-                                    <input type="text" name="support" value="{{ $titles->support ?? '' }}" required>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form_block">
-                        <div class="fb_inside">
-                            <div class="fb_label">
-                                <div class="fb_label_inside">
-                                    <label for="rules">Правила регулювання</label>
-                                </div>
-                            </div>
-                            <div class="fb_input">
-                                <div class="fb_input_inside">
-                                    <input type="text" name="rules" value="{{ $titles->rules ?? '' }}" required>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-            </div>
-
-
-
-            <div class="form_block active fb_submit">
-                <div class="fb_inside">
-                    <div class="fb_input">
-                        <div class="fb_input_inside">
-                                <button class="btn-save" name="save" value="true" type="submit">Зберегти</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-           
-        </form> --}}
-    </div>
 
 </section>
 @endsection

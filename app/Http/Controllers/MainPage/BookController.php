@@ -65,6 +65,23 @@ class BookController extends Controller
         $translates = DB::table('translates')->pluck($locale, 'slug');
 
 
+
+        $tags_tranlates = $book->tags->map(function ($el) {
+            return $el->translates[app()->getLocale()]->name;
+        })->toArray();
+
+    
+
+
+        $local_seo = [
+            'meta_title' => $book->translates[app()->getLocale()]['meta_title'],
+            'meta_description' => $book->translates[app()->getLocale()]['meta_desc'],
+            'og_title' => $book->translates[app()->getLocale()]['og_title'],
+            'og_desc' => $book->translates[app()->getLocale()]['og_desc'],
+            'img' => $book->img,
+            'meta_keywords' => implode(', ', $tags_tranlates),
+        ];
+
         // Логи
         UserActivity::create([
             'type' => 'view',
@@ -78,7 +95,8 @@ class BookController extends Controller
             'book' => $book,
             'chars' => $chars, // Передаем сгруппированные характеристики
             'translates' => $translates,
-            'otherBooks' => $otherBooks
+            'otherBooks' => $otherBooks,
+            'local_seo' => $local_seo
         ]);
     }
 }
