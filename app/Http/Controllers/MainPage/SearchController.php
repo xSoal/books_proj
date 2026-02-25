@@ -18,6 +18,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class SearchController extends Controller
 {
@@ -434,11 +435,14 @@ class SearchController extends Controller
             $final_title = implode('; ', $title_segments);
             $final_desc = implode('; ', $desc_segments);
 
+            $meta_title = Str::limit($final_title, 75, '...');
+            $meta_description = Str::limit($final_desc, 155, '...');
+    
             $local_seo = [
-                'meta_title'       => $final_title,
-                'meta_description' => $final_desc ?: $final_title,
-                'og_title'         => $final_title,
-                'og_description'   => $final_desc ?: $final_title,
+                'meta_title'       => $meta_title,
+                'meta_description' => $meta_description,
+                'og_title'         => $meta_title,
+                'og_description'   => $meta_description,
             ];
         }
     }
