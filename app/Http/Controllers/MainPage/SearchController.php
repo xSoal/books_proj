@@ -81,6 +81,11 @@ class SearchController extends Controller
     // --- 2. Сбор всех ID выбранных характеристик из URL ---
     $selected_input_range = [];
     $selected_char_vals_id = [];
+
+
+    // потом для сео все вібранніе id характеристик
+    $selected_chars_id = [];
+
     if ($filters) {
         $filter_parts = explode('/', $filters);
         foreach ($filter_parts as $part) {
@@ -92,13 +97,15 @@ class SearchController extends Controller
                 if (str_starts_with($part, $char_slug . '-')) {
                     $char_vals_slugs = substr($part, strlen($char_slug) + 1);
                     $parent_char_id = $char['id'];
+                    $selected_chars_id[] = $char['id'];
+
                     $parent_char_is_numeric = $char['is_numeric'] === 1;
                     break;
                 }
             }
             
             if ($parent_char_id && !$parent_char_is_numeric) {
-
+                
                 $char_vals_from_parent_map = [];
                 foreach ($chars->find($parent_char_id)->char_vals as $char_val) {
                     $char_vals_from_parent_map[$char_val->translates[app()->getLocale()]->slug] = $char_val->id;
@@ -328,6 +335,114 @@ class SearchController extends Controller
     $locale = app()->getLocale();
     $translates = DB::table('translates')->pluck($locale, 'slug');
 
+
+
+    // dinamic seo
+    // $local_seo = null;
+    // // 1. Считаем количество вложений в URL
+    // $filter_parts = $filters ? array_filter(explode('/', trim($filters, '/'))) : [];
+    // $filter_count = count($filter_parts);
+
+    // // 2. Формируем текстовое SEO, если вложений 1, 2 или 3
+    // if ($filter_count > 0 && $filter_count <= 3) {
+
+    //     $numeric_char_ids = array_keys($selected_input_range);
+
+    //     $seo_names = Characteristic::whereIn('id', $selected_chars_id)
+    //         ->whereNotIn('id', $numeric_char_ids)
+    //         ->with(['translates' => fn($q) => $q->where('lang', $locale)])
+    //         ->get()
+    //         ->map(fn($v) => [
+    //             'name' => $v->translates->first()->name ?? '',
+    //             'description' => $v->translates->first()->description ?? ''
+    //         ])
+    //         ->filter()
+    //         ->toArray();
+
+
+    //     if (!empty($seo_names)) {
+    //         $names = [
+    //             'title' => '',
+    //             'description' => ''
+    //         ];
+
+            
+    //         foreach ($seo_names as $value) {
+    //             if (!empty($value['name'])) {
+    //                 $names['title'] .= $value['name'] . ', ';
+    //             }
+    //             if (!empty($value['description'])) {
+    //                 $names['description'] .= $value['description'] . ', ';
+    //             }
+    //         }
+
+    //         $names['title'] = rtrim($names['title'], ', ');
+    //         $names['description'] = rtrim($names['description'], ', ');
+
+
+    //         $local_seo = [
+    //             'meta_title'       => $names['title'],
+    //             'meta_description' => $names['description'],
+    //             'og_title'         => $names['title'],
+    //             'og_description'   => $names['description'],
+    //         ];
+
+    //     }
+    // }
+
+    // dinamic seo
+    $local_seo = null;
+    $filter_parts = $filters ? array_filter(explode('/', trim($filters, '/'))) : [];
+    $filter_count = count($filter_parts);
+
+    if ($filter_count > 0 && $filter_count <= 3) {
+        $locale = app()->getLocale();
+        $numeric_char_ids = array_keys($selected_input_range);
+
+        $seo_data = Characteristic::whereIn('id', $selected_chars_id)
+            ->whereNotIn('id', $numeric_char_ids)
+            ->with([
+                'translates' => fn($q) => $q->where('lang', $locale),
+                // значения, которые выбраны 
+                'char_vals' => fn($q) => $q->whereIn('id', $selected_char_vals_id)
+                                        ->with(['translates' => fn($t) => $t->where('lang', $locale)])
+            ])
+            ->get();
+
+        if ($seo_data->isNotEmpty()) {
+            $title_segments = [];
+            $desc_segments = [];
+
+            foreach ($seo_data as $char) {
+                $char_name = $char->translates->first()->name ?? '';
+                $char_desc = $char->translates->first()->description ?? '';
+                
+                // Собираем все выбранные значения для этой характеристики
+                $val_names = $char->char_vals->map(function($val) use ($locale) {
+                    return $val->translates->first()->name ?? '';
+                })->filter()->implode(', ');
+
+                if (!empty($char_name) && !empty($val_names)) {
+                    $title_segments[] = $char_name . ': ' . $val_names;
+                }
+
+                if (!empty($char_desc)) {
+                    $desc_segments[] = $char_desc . ': ' . $val_names;
+                }
+            }
+
+            $final_title = implode('; ', $title_segments);
+            $final_desc = implode('; ', $desc_segments);
+
+            $local_seo = [
+                'meta_title'       => $final_title,
+                'meta_description' => $final_desc ?: $final_title,
+                'og_title'         => $final_title,
+                'og_description'   => $final_desc ?: $final_title,
+            ];
+        }
+    }
+
     return view('main_page.search', [
         'title' => 'Пошук',
         'chars' => $chars,
@@ -335,7 +450,8 @@ class SearchController extends Controller
         'books' => $books,
         'chars_for_sorted_map' => $chars_for_sorted_map,
         'selected_input_range' => $selected_input_range,
-        'translates' => $translates
+        'translates' => $translates,
+        'local_seo' => $local_seo
     ]);
 }
 }

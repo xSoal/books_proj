@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" /> 
     <meta property="og:type" content="website" />
 
-    @if($global_seo)
+    @if($global_seo && !isset($local_seo))
 
     <meta name="title" content="{{ $global_seo['meta_title'][app()->getLocale()] ?? '' }}" />
     <title>{{ $global_seo['meta_title'][app()->getLocale()] ?? '' }}</title>
@@ -41,9 +41,14 @@
     <meta name="title" content="{{ $local_seo['meta_title'] ?? '' }}" />
     <title>{{ $local_seo['meta_title'] ?? '' }}</title>
     <meta name="description" content="{{ $local_seo['meta_description'] ?? '' }}" />
+    @if(isset($local_seo['keywords']))
     <meta name="keywords" content="{{ $local_seo['meta_keywords'] ?? '' }}" />
+    @endif
     <meta property="og:title" content="{{ $local_seo['meta_title'] ?? '' }}" />
-    <meta property="og:image" content="{{ isset($local_seo['img']) && $local_seo['img'] !='' ? asset($local_seo['img']) : '' }}" />
+
+    @if(isset($local_seo['img']) && $local_seo['img'] !='')
+    <meta property="og:image" content="{{ asset($local_seo['img']) }}" />
+    @endif
     <meta property="og:description" content="{{ $local_seo['meta_description'] ?? '' }}" />
 
     @else
