@@ -38,13 +38,13 @@
     <meta property="og:description" content="{{ $global_seo['meta_description'][app()->getLocale()] ?? '' }}" />
 
     @elseif(isset($local_seo))
-        <meta name="title" content="{{ $local_seo['meta_title'] ?? '' }}" />
-        <title>{{ $local_seo['meta_title'] ?? '' }}</title>
-        <meta name="description" content="{{ $local_seo['meta_description'] ?? '' }}" />
-        <meta name="keywords" content="{{ $local_seo['meta_keywords'] ?? '' }}" />
-        <meta property="og:title" content="{{ $local_seo['meta_title'] ?? '' }}" />
-        <meta property="og:image" content="{{ isset($local_seo['img']) && $local_seo['img'] !='' ? asset($local_seo['img']) : '' }}" />
-        <meta property="og:description" content="{{ $local_seo['meta_description'] ?? '' }}" />
+    <meta name="title" content="{{ $local_seo['meta_title'] ?? '' }}" />
+    <title>{{ $local_seo['meta_title'] ?? '' }}</title>
+    <meta name="description" content="{{ $local_seo['meta_description'] ?? '' }}" />
+    <meta name="keywords" content="{{ $local_seo['meta_keywords'] ?? '' }}" />
+    <meta property="og:title" content="{{ $local_seo['meta_title'] ?? '' }}" />
+    <meta property="og:image" content="{{ isset($local_seo['img']) && $local_seo['img'] !='' ? asset($local_seo['img']) : '' }}" />
+    <meta property="og:description" content="{{ $local_seo['meta_description'] ?? '' }}" />
 
     @else
         <title>Jewish Studies UA</title>
