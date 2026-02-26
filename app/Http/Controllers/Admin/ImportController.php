@@ -23,19 +23,40 @@ class ImportController extends Controller
 {
     public function index(){
 
+        $booksToApprove = Book::where('need_approve', true)
+            ->with('translates')
+            ->get()
+            ->transform(function ($book) {
+                $book->setRelation('translates', $book->translates->keyBy('lang'));
+                return $book;
+            });
+
         $data = [
-            'title' => 'Імпорт'
+            'title' => 'Імпорт',
+            'booksToApprove' => $booksToApprove
         ];
 
         return view('admin.import.index', $data);
     }
 
+    public function approve(){
+        DB::table('books')->where('need_approve', true)->update(['need_approve' => false]);
+        DB::table('characteristics')->where('need_approve', true)->update(['need_approve' => false]);
+        DB::table('char_vals')->where('need_approve', true)->update(['need_approve' => false]);
+
+        $data = [
+            'title' =>  'Імпорт'
+        ];
+
+        return redirect()->route('admin.import', $data);
+    }
+
     public function add(Request $request){
         $langs = ['ua', 'en'];
 
-        // Characteristic::where('need_approve', true)->delete();
-        // CharacteristicValue::where('need_approve', true)->delete();
-        // Book::where('need_approve', true)->delete();
+        Characteristic::where('need_approve', true)->delete();
+        CharacteristicValue::where('need_approve', true)->delete();
+        Book::where('need_approve', true)->delete();
         // dd('qwe');
 
         $request->validate([
@@ -66,6 +87,7 @@ class ImportController extends Controller
         $book_tags = [
 
         ];
+
 
         $fields_chars_exception_with_one_lang = [
             'Рік(роки) / Year(s)' => ['ua' => 'Рік(роки)', 'en' => 'Year(s)'],
@@ -403,9 +425,9 @@ class ImportController extends Controller
                     $book_translate[$value['field_model_name']] = $value[$lang];
                 }
 
-                echo $book_translate->name . '!!!<br>';
-                var_dump($current_book_static_translates);
-                echo $book_translate->name . '!!!<br>';
+                // echo $book_translate->name . '!!!<br>';
+                // var_dump($current_book_static_translates);
+                // echo $book_translate->name . '!!!<br>';
                 $book_translate->save();
 
             }
@@ -524,11 +546,14 @@ class ImportController extends Controller
         // }
 
 
+
+
+
         $data = [
             'title' => 'Імпорт'
         ];
 
-        return view('admin.import.index', $data);
+        return redirect()->route('admin.import', $data);
     }
 
 }

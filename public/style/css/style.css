@@ -1274,13 +1274,18 @@ input:focus, select:focus {
 }
 
 .details-list a {
+    text-decoration: none;
     color: inherit;
+    padding-bottom: 2px;
+    border-bottom: 1px solid;
 }
 
 .details-list dt {
     font-weight: bold;
     color: #666;
 }
+
+
 
 /* Статус (право) */
 .status-card {

@@ -105,6 +105,7 @@ Route::group(['prefix' => '/admin', 'middleware' => 'auth'], function() {
     Route::group(['prefix' => 'import'], function () {
         Route::get('/', ['uses' => '\App\Http\Controllers\Admin\ImportController@index', 'as' => 'admin.import']);
         Route::post('/importAdd', ['uses' => '\App\Http\Controllers\Admin\ImportController@add', 'as' => 'admin.importAdd']);
+        Route::post('/importApprove', ['uses' => '\App\Http\Controllers\Admin\ImportController@approve', 'as' => 'admin.importApprove']);
     });
 
 
