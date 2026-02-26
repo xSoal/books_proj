@@ -182,7 +182,7 @@
                         <option value="{{ $key }}" {{ request('order') === $key ? 'selected' : ''}}>{{ $value }}</option>
                     @endforeach
                     @foreach ($chars_for_sorted_map as $key => $value )
-                        <option value="{{ $key }}-desc" {{ request('order') === $key . '-desc' ? 'selected' : ''}}>{{ $value['name'] }}</option>
+                        <option value="{{ $key }}-asc" {{ request('order') === $key . '-asc' ? 'selected' : ''}}>{{ $value['name'] }}</option>
                     @endforeach
                 </select>
             </div>

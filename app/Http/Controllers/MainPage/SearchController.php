@@ -24,7 +24,7 @@ class SearchController extends Controller
 {
     public function index(Request $request, $filters = null)
 {
-    $chars = Characteristic::where('need_approve', 0)
+    $chars = Characteristic::where('need_approve', false)
         // ->where('is_numeric', 0)
         ->where('in_filter', 1)
         ->whereExists(function ($query) {
@@ -166,11 +166,13 @@ class SearchController extends Controller
                 }
             }
         }
+
+        // dd($selected_char_vals_id);
     }
 
     // --- 3. Построение запроса (Сортировка теперь работает всегда) ---
     // Используем books.active для избежания конфликтов имен при JOIN
-    $query = Book::where('books.active', 1);
+    $query = Book::where('books.active', 1)->where('need_approve', false);
 
     // ФИЛЬТР: "Любые из выбранных" (Логика OR)
     // if (!empty($selected_char_vals_id)) {
@@ -204,6 +206,7 @@ class SearchController extends Controller
             ->whereNotIn('characteristic_id', $numeric_char_ids)
             ->get()
             ->groupBy('characteristic_id');
+
 
         foreach ($grouped_vals as $char_id => $val_ids) {
             $query->whereHas('char_vals', function($q) use ($val_ids) {
@@ -244,47 +247,46 @@ class SearchController extends Controller
         });
     }
 
-    // сорт:
+    // --- ИСПРАВЛЕННЫЙ БЛОК СОРТИРОВКИ ---
     $order = $request->query('order');
     if ($order) {
         $parts = explode('-', $order);
         $field = $parts[0];
         $direction = $parts[1] ?? 'asc';
 
-        switch ($field) {
-            case 'name':
-                $query->join('books_translates', 'books.id', '=', 'books_translates.book_id')
-                    ->where('books_translates.lang', app()->getLocale())
-                    ->select('books.*')
-                    ->orderBy('books_translates.name', $direction);
-                break;
+        if ($field === 'name') {
+            $query->join('books_translates', 'books.id', '=', 'books_translates.book_id')
+                ->where('books_translates.lang', app()->getLocale())
+                ->select('books.*')
+                ->orderBy('books_translates.name', $direction);
+        } elseif (isset($chars_for_sorted_map[$field])) {
+            $charId = $chars_for_sorted_map[$field]['id'];
+            $currentLang = app()->getLocale();
 
-            default:
-                if (isset($chars_for_sorted_map[$field])) {
-                    $charId = $chars_for_sorted_map[$field]['id'];
-                    $currentLang = app()->getLocale();
+            // Создаем подзапрос для получения имен характеристик, чтобы избежать дублей
+            $sortSub = DB::table('books_char_val as bcv')
+                ->join('char_vals as cv', 'bcv.char_val_id', '=', 'cv.id')
+                ->join('char_vals_trans as cvt', 'cv.id', '=', 'cvt.char_val_id')
+                ->where('cv.characteristic_id', $charId)
+                ->where('cvt.lang', $currentLang)
+                ->select('bcv.book_id', 'cvt.name as sort_value');
 
-                    $sortQuery = DB::table('char_vals_trans as cvt')
-                        ->join('char_vals as cv', 'cvt.char_val_id', '=', 'cv.id')
-                        ->join('books_char_val as bcv', 'cv.id', '=', 'bcv.char_val_id')
-                        ->whereColumn('bcv.book_id', 'books.id')
-                        ->where('cv.characteristic_id', $charId)
-                        ->where('cvt.lang', $currentLang)
-                        ->select('cvt.name')
-                        ->limit(1);
+            // Присоединяем подзапрос к основной выборке
+            $query->leftJoinSub($sortSub, 'sorting_table', function ($join) {
+                $join->on('books.id', '=', 'sorting_table.book_id');
+            })->select('books.*');
 
-                    $query->select('books.*')->selectSub($sortQuery, 'sort_val');
+            $characteristic = $chars_for_sorted_by->where('id', $charId)->first();
 
-                    $characteristic = $chars_for_sorted_by->where('id', $charId)->first();
-                    if ($characteristic && $characteristic->is_numeric) {
-                        $query->orderByRaw("ISNULL(sort_val) ASC, CAST(NULLIF(sort_val, '') AS SIGNED) $direction");
-                    } else {
-                        $query->orderByRaw("ISNULL(sort_val) ASC, LOWER(sort_val) COLLATE utf8mb4_unicode_ci $direction");
-                    }
-                } else {
-                    $query->orderBy('books.id', 'desc');
-                }
-                break;
+            // Применяем логику сортировки
+            if ($characteristic && $characteristic->is_numeric) {
+                $query->orderByRaw("ISNULL(sorting_table.sort_value) ASC, CAST(NULLIF(sorting_table.sort_value, '') AS SIGNED) $direction");
+            } else {
+                // Сортировка по алфавиту (Тип видання)
+                $query->orderByRaw("ISNULL(sorting_table.sort_value) ASC, LOWER(sorting_table.sort_value) $direction");
+            }
+        } else {
+            $query->orderBy('books.id', 'desc');
         }
     } else {
         $query->orderBy('books.id', 'desc');
@@ -296,7 +298,10 @@ class SearchController extends Controller
         'tags.translates',
         'char_vals.characteristic', 
         'char_vals.translates'
-    ])->distinct()->get();
+    ])
+    ->distinct()
+    ->get();
+
 
     $books->each(function($b) {
         $b->setRelation('translates', $b->translates->keyBy('lang'));
@@ -339,59 +344,6 @@ class SearchController extends Controller
 
 
     // dinamic seo
-    // $local_seo = null;
-    // // 1. Считаем количество вложений в URL
-    // $filter_parts = $filters ? array_filter(explode('/', trim($filters, '/'))) : [];
-    // $filter_count = count($filter_parts);
-
-    // // 2. Формируем текстовое SEO, если вложений 1, 2 или 3
-    // if ($filter_count > 0 && $filter_count <= 3) {
-
-    //     $numeric_char_ids = array_keys($selected_input_range);
-
-    //     $seo_names = Characteristic::whereIn('id', $selected_chars_id)
-    //         ->whereNotIn('id', $numeric_char_ids)
-    //         ->with(['translates' => fn($q) => $q->where('lang', $locale)])
-    //         ->get()
-    //         ->map(fn($v) => [
-    //             'name' => $v->translates->first()->name ?? '',
-    //             'description' => $v->translates->first()->description ?? ''
-    //         ])
-    //         ->filter()
-    //         ->toArray();
-
-
-    //     if (!empty($seo_names)) {
-    //         $names = [
-    //             'title' => '',
-    //             'description' => ''
-    //         ];
-
-            
-    //         foreach ($seo_names as $value) {
-    //             if (!empty($value['name'])) {
-    //                 $names['title'] .= $value['name'] . ', ';
-    //             }
-    //             if (!empty($value['description'])) {
-    //                 $names['description'] .= $value['description'] . ', ';
-    //             }
-    //         }
-
-    //         $names['title'] = rtrim($names['title'], ', ');
-    //         $names['description'] = rtrim($names['description'], ', ');
-
-
-    //         $local_seo = [
-    //             'meta_title'       => $names['title'],
-    //             'meta_description' => $names['description'],
-    //             'og_title'         => $names['title'],
-    //             'og_description'   => $names['description'],
-    //         ];
-
-    //     }
-    // }
-
-    // dinamic seo
     $local_seo = null;
     $filter_parts = $filters ? array_filter(explode('/', trim($filters, '/'))) : [];
     $filter_count = count($filter_parts);
@@ -416,7 +368,7 @@ class SearchController extends Controller
 
             foreach ($seo_data as $char) {
                 $char_name = $char->translates->first()->name ?? '';
-                $char_desc = $char->translates->first()->description ?? '';
+                $char_desc = $char->translates->first()->name ?? '';
                 
                 // Собираем все выбранные значения для этой характеристики
                 $val_names = $char->char_vals->map(function($val) use ($locale) {
