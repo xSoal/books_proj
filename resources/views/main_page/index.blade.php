@@ -4,15 +4,9 @@
 
 
 
-{{-- {{ route('login') }}
-
-{{ url(App\Http\Middleware\LocaleMiddleware::getLocale() .'/home') }} --}}
-
-
 <main id="main-content">
   <section class="hero-section">
       <div class="container">
-          <h1 class="section-title section-title--left">{{ $translates['home'] ?? 'Home' }}</h1>
           <div class="about_us wysiwyg">
             {!! $about_us !!}
           </div>  

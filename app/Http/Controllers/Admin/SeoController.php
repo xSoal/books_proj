@@ -9,16 +9,39 @@ use Illuminate\Support\Facades\DB;
 class SeoController extends Controller
 {
     public function index(){
-        $setting = DB::table('settings')
+        $query = DB::table('settings')
                 ->where('type', 'seo')
                 ->first();
+        $seo = json_decode($query->value, true);
 
-        $seo = json_decode($setting->value, true);
-        // dd($seo);
+
+        $query = DB::table('settings')->where('type', 'seoTemplates')->first();
+
+        if($query){
+            $seoTemplates = json_decode($query->value, true);
+        } else {
+            $data = [
+                'ua' => [
+                    'title' => 'Результат пошуку: REPLACE',
+                    'description' => 'Результат пошуку: REPLACE'
+                ],
+                'en' => [
+                    'title' => 'Search result: REPLACE',
+                    'description' => 'Search result: REPLACE'
+                ]
+            ];
+            DB::table('settings')->insert([
+                'type' => 'seoTemplates',
+                'value' => json_encode($data, JSON_UNESCAPED_UNICODE)
+            ]);
+
+            $seoTemplates = $data;
+        }
 
         $data = [
             'title' => 'Seo',
             'seo' => $seo,
+            'seoTemplates' => $seoTemplates,
         ];
 
         return view('admin.seo.edit', $data);
@@ -56,5 +79,19 @@ class SeoController extends Controller
         return redirect()->route('admin.seo');
     }
 
+    public function editTemplates(Request $request){
+        $input = $request->except('_token');
+
+        DB::table('settings')->updateOrInsert(
+            ['type' => 'seoTemplates'],
+            [
+                'value' => json_encode($input, JSON_UNESCAPED_UNICODE),
+                'updated_at' => now()
+            ]
+        );
+
+
+        return redirect()->route('admin.seo');
+    }
 
 }

@@ -25,7 +25,10 @@
                 <div class="tabPagesHeader {{ $i === 0 ? 'active' : '' }}">
                     {{ $page }}
                 </div>
-            @endforeach   
+            @endforeach
+            <div class="tabPagesHeader">
+                Шаблони для сео
+            </div>
         </div>
         <div class="tabPagesBodyCont">
             
@@ -115,7 +118,62 @@
                     </form>
 
                 @endforeach
+                <form action="{{ route('admin.seoEditTemplates') }}" method="POST">
+        
+                    {{ csrf_field() }}
 
+                    <div class="tabBody__page" data-index="4">
+
+                            <div class="langsForm">
+                                <div class="langsForm__headerCont">
+                                    @for ($i =0 ; $i < count($languages); $i++)
+                                        <div class="langsForm__lang {{ $i === 0 ? 'current' : '' }}">
+                                            {{ $languages[$i] }}
+                                        </div>
+                                    @endfor
+                                </div>
+                                <div class="langsForm__body">
+                                    <?php
+                                        $i = 0;
+                                    ?>
+                                    @foreach ($seoTemplates as $lang => $arr)
+                                        <div class="langsForm__langFields {{ $i++ === 0 ? 'show' : '' }}">
+                                            @foreach ($arr as $type => $value)
+                                                <div class="form_block">
+                                                    <div class="fb_inside">
+                                                        <div class="fb_label">
+                                                            <div class="fb_label_inside">
+                                                                <label for="{{ $lang }}_{{ $type }}">{{ $type }}</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="fb_input">
+                                                            <div class="fb_input_inside">
+                                                                <?php
+                                                                    // dd( $seo[$page][$tag][$languages[$i]] );
+                                                                ?>
+                                                                <input type="text" name="{{ $lang }}[{{ $type }}]" value="{{ $value ?? ''}}">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @endforeach
+
+                                </div>
+                            </div>
+                            
+                            <div class="form_block active fb_submit">
+                                <div class="fb_inside">
+                                    <div class="fb_input">
+                                        <div class="fb_input_inside">
+                                                <button class="btn-save" type="submit">Зберегти</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                </form>
         </div>
 
 

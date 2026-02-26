@@ -117,6 +117,7 @@ Route::group(['prefix' => '/admin', 'middleware' => 'auth'], function() {
     Route::group(['prefix' => 'seo'], function () {
         Route::get('/', ['uses' => '\App\Http\Controllers\Admin\SeoController@index', 'as' => 'admin.seo']);
         Route::post('/edit', ['uses' => '\App\Http\Controllers\Admin\SeoController@edit', 'as' => 'admin.seoEdit']);
+        Route::post('/editTemplates', ['uses' => '\App\Http\Controllers\Admin\SeoController@editTemplates', 'as' => 'admin.seoEditTemplates']);
     });
 
 });

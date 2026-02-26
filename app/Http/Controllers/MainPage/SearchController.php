@@ -435,9 +435,17 @@ class SearchController extends Controller
             $final_title = implode('; ', $title_segments);
             $final_desc = implode('; ', $desc_segments);
 
-            $meta_title = Str::limit($final_title, 75, '...');
-            $meta_description = Str::limit($final_desc, 155, '...');
+            $meta_title = Str::limit($final_title, 71, '...');
+            $meta_description = Str::limit($final_desc, 139, '...');
     
+            $q = DB::table('settings')->where('type', 'seoTemplates')->first();
+
+            if($q){
+                $temps = json_decode($q->value, true)[$locale];
+                $meta_title = str_replace('REPLACE', $meta_title, $temps['title']);
+                $meta_description = str_replace('REPLACE', $meta_description, $temps['description']);
+            }
+
             $local_seo = [
                 'meta_title'       => $meta_title,
                 'meta_description' => $meta_description,
