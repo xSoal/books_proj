@@ -40,20 +40,28 @@
                 @if($char->is_numeric === 1)
                 <div class="filter-group input__numericRange numeric" data-slug="{{ $char->translates[app()->getLocale()]->slug }}">
                     <label>{{ $char->translates[app()->getLocale()]->name }}</label>
-                    <div class="range-slider-container">
-                        <div class="slider-track"></div>
-                        <input type="range" min="{{ $char['total_min'] }}" max="{{ $char['total_max'] }}" value="{{ isset($selected_input_range[$char->id]) ? $selected_input_range[$char->id]['cur_min'] : $char['total_min'] }}" class="slider_range_1" >
-                        <input type="range" min="{{ $char['total_min'] }}" max="{{ $char['total_max'] }}" value="{{ isset($selected_input_range[$char->id]) ? $selected_input_range[$char->id]['cur_max'] : $char['total_max'] }}" class="slider_range_2" >
+                    <div class="numericRangeFlexCont">
+                        <div class="numericRange__rangeCont">
+                            <div class="range-slider-container">
+                                <div class="slider-track"></div>
+                                <input type="range" min="{{ $char['total_min'] }}" max="{{ $char['total_max'] }}" value="{{ isset($selected_input_range[$char->id]) ? $selected_input_range[$char->id]['cur_min'] : $char['total_min'] }}" class="slider_range_1" >
+                                <input type="range" min="{{ $char['total_min'] }}" max="{{ $char['total_max'] }}" value="{{ isset($selected_input_range[$char->id]) ? $selected_input_range[$char->id]['cur_max'] : $char['total_max'] }}" class="slider_range_2" >
+                            </div>
+                            <div class="range-values">
+                                <span class="range_1">{{ isset($selected_input_range[$char->id]) ? $selected_input_range[$char->id]['cur_min'] : $char['total_min'] }}</span>
+                                <span> — </span>
+                                <span class="range_2">{{ isset($selected_input_range[$char->id]) ? $selected_input_range[$char->id]['cur_max'] : $char['total_max'] }}</span>
+                            </div>
+                        </div>
+                        <div class="numericRange__buttonCont">
+                            <div class="input__numericRangeButtonCont">
+                                <a class="btn-reset input__numericRangeButton">Ок</a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="range-values">
-                        <span class="range_1">{{ isset($selected_input_range[$char->id]) ? $selected_input_range[$char->id]['cur_min'] : $char['total_min'] }}</span>
-                        <span> — </span>
-                        <span class="range_2">{{ isset($selected_input_range[$char->id]) ? $selected_input_range[$char->id]['cur_max'] : $char['total_max'] }}</span>
-                    </div>
+
                     <br>
-                    <div class="input__numericRangeButtonCont">
-                        <a class="btn-reset input__numericRangeButton">Ок</a>
-                    </div>
+
                 </div>
                 @endif
             @endif

@@ -49,15 +49,17 @@
                     @foreach ($chars as $char)
                         @foreach ($char->char_vals as $char_val)
                         <dt>
-                            <a href="{{ route('search', []) }}">
-
-                            </a>
                             {{ $char->translates[app()->getLocale()]->name }}:
                         </dt>
                         <dd>
+                            @if((int)$char->in_filter === 1)
                             <a href="{{ route('search', $char->translates[app()->getLocale()]->slug . '-' . $char_val->translates[app()->getLocale()]->slug) }}">
                                 {{ $char_val->translates[app()->getLocale()]->name }}
                             </a>
+                            @else
+                                {{ $char_val->translates[app()->getLocale()]->name }}
+                            @endif
+
                         </dd>
                         @endforeach
    

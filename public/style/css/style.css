@@ -700,6 +700,26 @@ textarea.feed_back_textArea::placeholder {
     text-align: center;
 }
 
+.numericRangeFlexCont {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.numericRange__rangeCont {
+    width: 100%;
+}
+
+.numericRange__buttonCont {
+    margin: 10px;
+    transform: translateY(-10px)
+}
+
+.input__numericRangeButton {
+    padding: 7px;
+    font-size: 0.7em;
+}
+
 .range-slider-container {
     position: relative;
     width: 100%;

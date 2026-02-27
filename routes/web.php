@@ -221,12 +221,8 @@ Route::get('setlocale/{lang}', function ($lang) {
 })->name('setlocale');
 
 function translateFilterSegment($part, $newLang) {
-    // 1. Ищем длинную характеристику в начале строки
-    // Нам нужно понять, где заканчивается слаг характеристики и начинаются значения
-    // Сначала получим все слаги характеристик для текущего языка (или из кэша)
+    // 1. Ищем слаг характеристики в начале строки
     $allCharSlugs = DB::table('characteristics_translates')->pluck('slug')->toArray();
-    
-    // Сортируем по длине (от длинных к коротким), чтобы сначала находить "long-slug", а не "long"
     usort($allCharSlugs, fn($a, $b) => strlen($b) <=> strlen($a));
 
     $foundCharSlug = null;
@@ -237,46 +233,46 @@ function translateFilterSegment($part, $newLang) {
         }
     }
 
-    if (!$foundCharSlug) return $part; // Не опознали фильтр
+    if (!$foundCharSlug) return $part;
 
-    // 2. Определяем ID характеристики и её новый слаг
-    $charId = DB::table('characteristics_translates')
-        ->where('slug', $foundCharSlug)
-        ->value('characteristic_id');
-        
+    // 2. Получаем данные характеристики
+    $charData = DB::table('characteristics_translates')
+        ->join('characteristics', 'characteristics.id', '=', 'characteristics_translates.characteristic_id')
+        ->where('characteristics_translates.slug', $foundCharSlug)
+        ->select('characteristics.id', 'characteristics.is_numeric')
+        ->first();
+
+    if (!$charData) return $part;
+
+    // 3. Новый слаг характеристики
     $newCharSlug = DB::table('characteristics_translates')
-        ->where('characteristic_id', $charId)
+        ->where('characteristic_id', $charData->id)
         ->where('lang', $newLang)
         ->value('slug') ?: $foundCharSlug;
 
-    // 3. Выделяем часть со значениями (всё, что после "slug-")
+    // 4. Часть со значениями
     $valuesPart = substr($part, strlen($foundCharSlug) + 1);
-    
-    // Разбиваем значения. Они могут быть соединены дефисом
-    // Но так как слаги значений сами могут содержать дефисы, это сложнее.
-    // Самый надежный способ: найти все возможные ID значений для этой характеристики
-    $valSlugs = explode('-', $valuesPart);
-    $newValSlugs = [];
 
-    // Находим все переводы значений для этой конкретной характеристики
+    // --- НОВОЕ: Если характеристика числовая, просто возвращаем новый слаг + старые числа ---
+    if ($charData->is_numeric) {
+        return $newCharSlug . '-' . $valuesPart;
+    }
+
+    // 5. Логика для обычных характеристик (авторы, жанры и т.д.)
+    $newValSlugs = [];
     $allVals = DB::table('char_vals_trans')
         ->join('char_vals', 'char_vals.id', '=', 'char_vals_trans.char_val_id')
-        ->where('char_vals.characteristic_id', $charId)
+        ->where('char_vals.characteristic_id', $charData->id)
         ->select('char_vals_trans.slug', 'char_vals_trans.char_val_id')
         ->get();
 
-    // Пытаемся сопоставить каждый сегмент
     $tempString = $valuesPart;
     while (strlen($tempString) > 0) {
         $matched = false;
-        
-        // Сортируем слаги значений текущей характеристики по длине
         $currentLangVals = $allVals->sortByDesc(fn($item) => strlen($item->slug));
 
         foreach ($currentLangVals as $val) {
-            // Если текущая строка начинается со слага или равна ему
             if ($tempString === $val->slug || strpos($tempString, $val->slug . '-') === 0) {
-                // Ищем этот же ID на новом языке
                 $translatedVal = DB::table('char_vals_trans')
                     ->where('char_val_id', $val->char_val_id)
                     ->where('lang', $newLang)
@@ -284,7 +280,6 @@ function translateFilterSegment($part, $newLang) {
                 
                 $newValSlugs[] = $translatedVal ?: $val->slug;
                 
-                // Отрезаем найденную часть
                 $cutLen = strlen($val->slug);
                 if (isset($tempString[$cutLen]) && $tempString[$cutLen] === '-') $cutLen++;
                 $tempString = substr($tempString, $cutLen);
@@ -295,7 +290,7 @@ function translateFilterSegment($part, $newLang) {
         }
 
         if (!$matched) {
-            // Если это число (диапазон), просто оставляем как есть
+            // Если не совпало и не числовая — берем до первого дефиса
             $parts = explode('-', $tempString);
             $newValSlugs[] = $parts[0];
             $tempString = substr($tempString, strlen($parts[0]) + 1);

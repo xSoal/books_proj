@@ -117,7 +117,6 @@ function initInputRange(){
 
     $(inputRange).find('.input__numericRangeButton').click(function(){
 
-      console.log(sliderOne, sliderOne.value, sliderTwo.value);
 
 
       var slug = $(this).closest('.input__numericRange').attr('data-slug');
@@ -129,14 +128,15 @@ function initInputRange(){
         if (parseInt(sliderTwo.value) - parseInt(sliderOne.value) <= minGap) {
             sliderOne.value = parseInt(sliderTwo.value) - minGap;
         }
-        displayValOne.textContent = sliderOne.value;
+        displayValOne.html(sliderOne.value);
+        
     }
 
     function slideTwo() {
         if (parseInt(sliderTwo.value) - parseInt(sliderOne.value) <= minGap) {
             sliderTwo.value = parseInt(sliderOne.value) + minGap;
         }
-        displayValTwo.textContent = sliderTwo.value;
+        displayValTwo.html(sliderTwo.value);
     }
   });
 
