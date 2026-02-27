@@ -9,8 +9,6 @@ use App\Models\Characteristic;
 use App\Models\CharacteristicTranslate;
 use App\Models\CharacteristicValue;
 use App\Models\CharacteristicValueTranslate;
-use App\Models\Tag;
-use App\Models\TagTranslate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -45,45 +43,28 @@ class ImportController extends Controller
         return redirect()->route('admin.import')->with('success', 'Дані успішно підтверджені');
     }
 
-
+    /**
+     * Глубокая очистка строки от мусора Excel и невидимых символов
+     */
     private function cleanString($value)
     {
-        // if (is_null($value)) return '';
-        // $value = (string)$value;
-    
-        // // убираем невидимые символы Excel
-        // $value = str_replace(["\xc2\xa0", "\xa0", "&nbsp;", "\xEF\xBB\xBF"], ' ', $value);
-        
-        // $value = str_replace(["\r", "\n", "\t"], ' ', $value);
-        
+        if (is_null($value)) return '';
+        $value = (string)$value;
+
+        // Удаляем неразрывные пробелы и артефакты UTF-8
+        $value = str_replace(["\xc2\xa0", "\xa0", "&nbsp;", "\xEF\xBB\xBF"], ' ', $value);
+        // Удаляем управляющие символы и лишние пробелы
+        $value = str_replace(["\r", "\n", "\t"], ' ', $value);
+        $value = preg_replace('/\s+/u', ' ', $value);
+
         return trim($value);
     }
 
-
-    private function generateUniqueSlug($modelClass, $name)
-    {
-        $slug = Str::slug($name);
-        if (empty($slug)) {
-            $slug = 'n-a';
-        }
-
-        $originalSlug = $slug;
-        $i = 1;
-
-        while ($modelClass::where('slug', $slug)->exists()) {
-            $slug = $originalSlug . '-' . $i++;
-        }
-
-        return $slug;
-    }
-
-
-
     public function add(Request $request) {
         $langs = ['ua', 'en'];
-        $fields_to_ignore = ['Дизайн'];
-        $tags = ['Ключові слова', 'Key words'];
-        // Очистка старых данных (только тех, что не одобрены)
+        $fields_to_ignore = ['Дизайн', 'Ключові слова', 'Key words'];
+
+        // Очистка старых данных
         Characteristic::where('need_approve', true)->delete();
         CharacteristicValue::where('need_approve', true)->delete();
         Book::where('need_approve', true)->delete();
@@ -113,35 +94,20 @@ class ImportController extends Controller
             'URL' => ['ua' => 'URL', 'en' => 'URL'],
         ];
 
-        $error_messages = [];
-
-        foreach ($data as $index => $bookRow) {
+        foreach ($data as $bookRow) {
             array_shift($bookRow); 
-            if (empty($bookRow[0])) {
-                // $error_messages[] = "Строка {$index}: пустая первая колонка";
-                continue;
-            }
+    
+            if (empty($bookRow[0])) continue;
         
+            // Проверка на заголовок (индекс 8 - Назва)
             $checkName = $this->cleanString($bookRow[8] ?? ''); 
-            if (empty($checkName)) {
-                $row = $index + 2;
-                $error_messages[] = "Рядок $row : порожня назва, або помилка читання $bookRow[8]";
-                continue;
-            }
-
+            if ($checkName === 'Назва' || $checkName === 'Title' || empty($checkName)) continue;
             
-            // if (empty(trim($bookRow[3] ?? '')) && empty(trim($bookRow[4] ?? ''))) {
-            //      // Раскомментируй строку ниже, чтобы увидеть номера строк, которые не прошли
-            //      $error_messages[] = "Строка {$index + 2}: пропущена по условию колонок 3 и 4. Название: " . $checkName;
-            //      continue;
-            // }
-
-
+            if (empty(trim($bookRow[3] ?? '')) && empty(trim($bookRow[4] ?? ''))) continue;
 
             $current_book_static_fields = [];
             $current_book_static_translates = [];
             $current_book_dynamic_translates = [];
-            $current_book_tags_ids = [];
 
             for ($i = 0; $i < count($bookRow); $i++) {
                 $current_val = $this->cleanString($bookRow[$i] ?? '');
@@ -169,44 +135,6 @@ class ImportController extends Controller
 
                 if (in_array($header_name, $fields_to_ignore)) continue;
 
-                if (in_array($header_name, $tags)){
-                    $tag_name_ua = explode(',', $current_val);
-                    $tag_name_en = explode(',', $this->cleanString($bookRow[$i + 1] ?? ''));
-                    $max_length = max(count($tag_name_ua), count($tag_name_en));
-    
-                    for ($e = 0; $e < $max_length; $e++) {
-                        $name_ua = $this->cleanString($tag_name_ua[$e] ?? '');
-                        $name_en = $this->cleanString($tag_name_en[$e] ?? '');
-                        $search_name = !empty($name_ua) ? $name_ua : $name_en;
-    
-                        if (empty($search_name)) continue;
-    
-                        // Ищем тег по любому из языков, чтобы не плодить дубликаты Tag
-                        $tagTrans = TagTranslate::where('name', $search_name)->first();
-    
-                        if (!$tagTrans) {
-                            $tag = new Tag();
-                            $tag->save();
-    
-                            // Создаем сразу ОБА перевода
-                            foreach (['ua' => $name_ua, 'en' => $name_en] as $l => $val) {
-                                $finalName = !empty($val) ? $val : $search_name;
-                                TagTranslate::create([
-                                    'tag_id' => $tag->id,
-                                    'lang'   => $l,
-                                    'name'   => $finalName,
-                                    'slug'   => $this->generateUniqueSlug(TagTranslate::class, $finalName)
-                                ]);
-                            }
-                        } else {
-                            $tag = Tag::find($tagTrans->tag_id);
-                        }
-                        
-                        $current_book_tags_ids[$tag->id] = $tag->id;
-                    }
-                    $i++; continue;
-                };
-
                 if (isset($fields_chars_exception_with_one_lang[$header_name])) {
                     $current_book_dynamic_translates[] = [
                         'header_ua' => $fields_chars_exception_with_one_lang[$header_name]['ua'],
@@ -233,7 +161,7 @@ class ImportController extends Controller
                 }
             }
 
-            // --- СОЗДАНИЕ КНИГИ ---
+            // СОЗДАНИЕ КНИГИ
             $book = new Book();
             $book->sort = (!empty($current_book_static_fields['sort'])) ? (int)$current_book_static_fields['sort'] : 1;
             $book->need_approve = true;
@@ -245,7 +173,8 @@ class ImportController extends Controller
                 $book_translate->lang = $lang;
                 
                 $raw_name = $current_book_static_translates['Назва'][$lang] ?? 'no-name';
-                $book_translate->slug = $this->generateUniqueSlug(BookTranslate::class, $raw_name);
+                $slug = Str::slug($raw_name) . '-' . $lang . '-' . $book->id;
+                $book_translate->slug = $slug;
 
                 foreach ($current_book_static_translates as $trans_data) {
                     $book_translate[$trans_data['field_model_name']] = $trans_data[$lang];
@@ -253,7 +182,7 @@ class ImportController extends Controller
                 $book_translate->save();
             }
 
-            // --- ХАРАКТЕРИСТИКИ ---
+            // ХАРАКТЕРИСТИКИ
             $assigned_val_ids = [];
 
             foreach ($current_book_dynamic_translates as $charArr) {
@@ -276,7 +205,7 @@ class ImportController extends Controller
                             'characteristic_id' => $char->id,
                             'lang' => $lang,
                             'name' => $name,
-                            'slug' => $this->generateUniqueSlug(CharacteristicTranslate::class, $name),
+                            'slug' => Str::slug($name) . '-' . $lang . '-' . $char->id,
                             'description' => ''
                         ]);
                     }
@@ -299,13 +228,11 @@ class ImportController extends Controller
                             'char_val_id' => $char_val->id,
                             'lang' => $lang,
                             'name' => $name,
-                            'slug' => $this->generateUniqueSlug(CharacteristicValueTranslate::class, $name),
+                            'slug' => Str::slug($name) . '-' . $lang . '-' . $char_val->id,
                             'description' => ''
                         ]);
                     }
                 }
-
-
                 
                 $assigned_val_ids[$char_val->id] = [
                     'book_id' => $book->id,
@@ -315,33 +242,12 @@ class ImportController extends Controller
                 ];
             }
 
-            // теги
-            if (!empty($current_book_tags_ids)) {
-                $tag_data = [];
-                foreach ($current_book_tags_ids as $tagId) {
-                    $tag_data[] = [
-                        'book_id' => $book->id,
-                        'tag_id'  => $tagId
-                    ];
-                }
-                DB::table('books_tags')->insertOrIgnore($tag_data);
-            }
-
-
             if (!empty($assigned_val_ids)) {
                 DB::table('books_char_val')->insert(array_values($assigned_val_ids));
             }
         }
 
-        // dd($error_messages);
-
-        return redirect()
-            ->route('admin.import')
-            ->with([
-                'success' => 'Імпорт завершено', 
-                'error_messages' => $error_messages
-            ]);
-
+        return redirect()->route('admin.import')->with('success', 'Імпорт завершено');
     }
 }
 

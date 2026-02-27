@@ -254,6 +254,7 @@ class BooksController extends Controller
                         $query->whereHas('translates', function($q) use ($search) {
                             $q->where(function($innerQ) use ($search) {
                                 $innerQ->where('name', 'LIKE', '%'.$search.'%')
+                                        ->orWhere('id', 'LIKE', '%'.$search.'%')
                                         ->orWhere('anotation', 'LIKE', '%'.$search.'%')
                                         ->orWhere('slug', 'LIKE', '%'.$search.'%');
                             });

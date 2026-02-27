@@ -20,6 +20,7 @@ class Characteristic extends Model
         'can_sorted_by',
         'is_author',
         'is_type',
+        'need_approve',
     ];
 
     public function translates(){

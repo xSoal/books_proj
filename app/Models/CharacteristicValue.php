@@ -13,7 +13,8 @@ class CharacteristicValue extends Model
 
     protected $fillable = [
         'characteristic_id',
-        'active'
+        'active',
+        'need_approve',
     ];
 
     public function translates(){

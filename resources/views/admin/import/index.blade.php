@@ -24,36 +24,7 @@
     </div>
     @endif
 
-    @if($booksToApprove->count())
-        <div class="form_block_items form_add form_edit">
-            <form action="{{ route('admin.importApprove') }}" method="POST" enctype="multipart/form-data">
-                {{ csrf_field() }} 
-                <div class="select_bg"></div>
-
-                <div>
-                    <h3>Книги що були імпортовані ({{ $booksToApprove->count() }}) :</h3>
-                    @foreach ($booksToApprove as $book)
-                        <div>
-                            <a href="{{ route('admin.viewBook', $book->id) }}" target="_blank">{{ $book->translates['ua']->name }}</a>
-                        </div>  
-                    @endforeach
-                </div>
-
-
-                <div class="form_block active fb_submit">
-                    <div class="fb_inside">
-                        <div class="fb_input">
-                            <div class="fb_input_inside">
-                                <button class="btn-save" name="save" value="true" type="submit">Підтвердити імпорт</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </form>
-        </div>
-    @endif
-
+    
     <div class="form_block_items form_add form_edit">
         <form action="{{ route('admin.importAdd') }}" method="POST" enctype="multipart/form-data">
             {{ csrf_field() }} 
@@ -90,6 +61,49 @@
 
         </form>
     </div>
+
+    @if($booksToApprove->count())
+        <div class="form_block_items form_add form_edit">
+            <form action="{{ route('admin.importApprove') }}" method="POST" enctype="multipart/form-data">
+                {{ csrf_field() }} 
+                <div class="select_bg"></div>
+
+                <div class="form_block active fb_submit">
+                    <div class="fb_inside">
+                        <div class="fb_input">
+                            <div class="fb_input_inside">
+                                <button class="btn-save" name="save" value="true" type="submit">Підтвердити імпорт</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if( session('error_messages') )
+                    <div>
+                        Спрацювали фільтри
+                        @foreach ( session('error_messages') as $err)
+                            <div>{{ $err }}</div>
+                        @endforeach
+                    </div>
+                @endif
+
+
+                <div>
+                    <h3>Книги що були імпортовані ({{ $booksToApprove->count() }}) :</h3>
+                    @foreach ($booksToApprove as $book)
+                        <div>
+                            <a href="{{ route('admin.viewBook', $book->id) }}" target="_blank">{{ $book->translates['ua']->name }}</a>
+                        </div>  
+                    @endforeach
+                </div>
+
+
+
+
+            </form>
+        </div>
+    @endif
+
 
 </section>
 

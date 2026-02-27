@@ -10,7 +10,8 @@ class Tag extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'status'
+        'status',
+        'need_approve',
     ];
 
     

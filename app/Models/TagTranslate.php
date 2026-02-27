@@ -14,6 +14,7 @@ class TagTranslate extends Model
     protected $fillable = [
         'name',
         'slug',
-        'lang'
+        'lang',
+        'tag_id'
     ];
 }

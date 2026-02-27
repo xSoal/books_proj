@@ -15,6 +15,7 @@ class Book extends Model
         'img',
         'sort',
         'active',
+        'need_approve'
     ];
 
     public function translates(){

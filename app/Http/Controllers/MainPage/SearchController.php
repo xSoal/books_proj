@@ -79,6 +79,8 @@ class SearchController extends Controller
         ];
     }
 
+
+
     // --- 2. Сбор всех ID выбранных характеристик из URL ---
     $selected_input_range = [];
     $selected_char_vals_id = [];
@@ -131,14 +133,14 @@ class SearchController extends Controller
             } else if ($parent_char_id && $parent_char_is_numeric) {
                 $range_parts = explode('-', $char_vals_slugs);
                 
-                // Очищаем от пустых и берем только числовые значения
+                // очищаем от пустых и берем только числовые значения
                 $numbers = array_values(array_filter($range_parts, fn($v) => is_numeric($v)));
             
                 if (count($numbers) >= 2) {
                     $min = min($numbers[0], $numbers[1]);
                     $max = max($numbers[0], $numbers[1]);
 
-                    // 2. Ищем все ID значений этой характеристики, которые числово входят в диапазон
+                    // ищем все ID значений этой характеристики, которые числово входят в диапазон
                     // name из таблицы переводов и приводим его к числу в SQL
                     $range_val_ids = DB::table('char_vals')
                         ->join('char_vals_trans', 'char_vals.id', '=', 'char_vals_trans.char_val_id')
@@ -167,12 +169,10 @@ class SearchController extends Controller
             }
         }
 
-        // dd($selected_char_vals_id);
+       
     }
 
-    // --- 3. Построение запроса (Сортировка теперь работает всегда) ---
-    // Используем books.active для избежания конфликтов имен при JOIN
-    $query = Book::where('books.active', 1)->where('need_approve', false);
+    $query = Book::where('books.active', 1)->where('books.need_approve', false);
 
     // ФИЛЬТР: "Любые из выбранных" (Логика OR)
     // if (!empty($selected_char_vals_id)) {
@@ -183,7 +183,7 @@ class SearchController extends Controller
     // }
 
 
-    // 1. Фильтр по числовым диапазонам (обязательное соответствие каждому диапазону)
+    // фльтр по числовым диапазонам (обязательное соответствие каждому диапазону)
     if (!empty($selected_input_range)) {
         foreach ($selected_input_range as $char_id => $range) {
             $query->whereHas('char_vals', function($q) use ($char_id, $range) {
@@ -195,13 +195,13 @@ class SearchController extends Controller
         }
     }
 
-    // 2. Фильтр по обычным чекбоксам (Логика: Книга должна иметь хотя бы одно из выбранных значений в группе)
-    // Но если выбрано несколько разных характеристик (напр. Автор И Тип), используем AND между группами
+    // фильтр по обычным чекбокса
+    // Но если выбрано несколько разных характеристик (напр. Автор И Тип), AND между группами
     if (!empty($selected_char_vals_id)) {
-        // Получаем ID только тех значений, которые НЕ относятся к числовым (они уже обработаны выше)
+        // Получаем ID только тех значений, которые НЕ относятся к числовым
         $numeric_char_ids = array_keys($selected_input_range);
         
-        // Группируем выбранные ID по их характеристикам, чтобы между разными группами был И
+        // uруппируем выбранные ID по их характеристикам, чтобы между разными группами был И
         $grouped_vals = CharacteristicValue::whereIn('id', $selected_char_vals_id)
             ->whereNotIn('characteristic_id', $numeric_char_ids)
             ->get()
@@ -236,10 +236,10 @@ class SearchController extends Controller
                 $q->where('lang', $locale)
                   ->where(function ($sub) use ($search) {
                       $sub->where('name', 'LIKE', $search)
-                          ->orWhere('anotation', 'LIKE', $search); // Убедитесь, что в БД именно 'anotation', а не 'annotation'
+                          ->orWhere('anotation', 'LIKE', $search);
                   });
             })
-            // 2. ИЛИ поиск по значениям всех характеристик, привязанных к книге
+            //ИЛИ поиск по значениям всех характеристик, привязанных к книге
             ->orWhereHas('char_vals.translates', function ($q) use ($search, $locale) {
                 $q->where('lang', $locale)
                   ->where('name', 'LIKE', $search);
@@ -247,62 +247,57 @@ class SearchController extends Controller
         });
     }
 
-    // --- ИСПРАВЛЕННЫЙ БЛОК СОРТИРОВКИ ---
     $order = $request->query('order');
-    if ($order) {
-        $parts = explode('-', $order);
-        $field = $parts[0];
-        $direction = $parts[1] ?? 'asc';
 
-        if ($field === 'name') {
-            $query->join('books_translates', 'books.id', '=', 'books_translates.book_id')
-                ->where('books_translates.lang', app()->getLocale())
-                ->select('books.*')
-                ->orderBy('books_translates.name', $direction);
-        } elseif (isset($chars_for_sorted_map[$field])) {
-            $charId = $chars_for_sorted_map[$field]['id'];
-            $currentLang = app()->getLocale();
+    if ($order && str_contains($order, '-')) {
+        $direction = str_ends_with($order, '-desc') ? 'desc' : 'asc';
+        $field = str_replace(['-asc', '-desc'], '', $order);
+    } else {
+        $field = 'id';
+        $direction = 'desc';
+    }
 
-            // Создаем подзапрос для получения имен характеристик, чтобы избежать дублей
-            $sortSub = DB::table('books_char_val as bcv')
-                ->join('char_vals as cv', 'bcv.char_val_id', '=', 'cv.id')
-                ->join('char_vals_trans as cvt', 'cv.id', '=', 'cvt.char_val_id')
-                ->where('cv.characteristic_id', $charId)
-                ->where('cvt.lang', $currentLang)
-                ->select('bcv.book_id', 'cvt.name as sort_value');
-
-            // Присоединяем подзапрос к основной выборке
-            $query->leftJoinSub($sortSub, 'sorting_table', function ($join) {
-                $join->on('books.id', '=', 'sorting_table.book_id');
-            })->select('books.*');
-
-            $characteristic = $chars_for_sorted_by->where('id', $charId)->first();
-
-            // Применяем логику сортировки
-            if ($characteristic && $characteristic->is_numeric) {
-                $query->orderByRaw("ISNULL(sorting_table.sort_value) ASC, CAST(NULLIF(sorting_table.sort_value, '') AS SIGNED) $direction");
-            } else {
-                // Сортировка по алфавиту (Тип видання)
-                $query->orderByRaw("ISNULL(sorting_table.sort_value) ASC, LOWER(sorting_table.sort_value) $direction");
-            }
-        } else {
-            $query->orderBy('books.id', 'desc');
-        }
+    if ($field === 'name') {
+        // Сортировка по названию (через переводы)
+        $query->join('books_translates as bt', 'books.id', '=', 'bt.book_id')
+            ->where('bt.lang', app()->getLocale())
+            ->select('books.*') // Чтобы не перемешивать поля из разных таблиц
+            ->orderBy('bt.name', $direction);
+    
+    } elseif (isset($chars_for_sorted_map[$field])) {
+        // Сортировка по динамическим характеристикам (ISBN, Год и т.д.)
+        $charId = $chars_for_sorted_map[$field]['id'];
+        $locale = app()->getLocale();
+    
+        $query->leftJoin('books_char_val as bcv', 'books.id', '=', 'bcv.book_id')
+            ->leftJoin('char_vals as cv', function ($join) use ($charId) {
+                $join->on('bcv.char_val_id', '=', 'cv.id')
+                     ->where('cv.characteristic_id', $charId);
+            })
+            ->leftJoin('char_vals_trans as cvt', function ($join) use ($locale) {
+                $join->on('cv.id', '=', 'cvt.char_val_id')
+                     ->where('cvt.lang', $locale);
+            })
+            // select, чтобы избежать дублирования колонок
+            ->select('books.*')
+            ->orderByRaw("CONVERT(cvt.name USING utf8mb4) COLLATE utf8mb4_unicode_ci $direction");
+    
     } else {
         $query->orderBy('books.id', 'desc');
     }
 
-    // Получаем результат (distinct нужен, чтобы избежать дублей из-за JOIN/whereHas)
-    $books = $query->with([
+    
+    $books = $query
+    ->with([
         'translates', 
         'tags.translates',
         'char_vals.characteristic', 
         'char_vals.translates'
     ])
-    ->distinct()
+    ->groupBy('books.id') 
     ->get();
 
-
+    
     $books->each(function($b) {
         $b->setRelation('translates', $b->translates->keyBy('lang'));
     
@@ -326,13 +321,13 @@ class SearchController extends Controller
         'ranges'      => $selected_input_range,  
     ];
 
-    // Проверяем, было ли хоть какое-то действие (поиск или фильтрация)
+    //  было ли хоть какое-то действие (поиск или фильтрация)
     if ($request->anyFilled(['search', 'tag', 'order']) || !empty($filters)) {
         UserActivity::create([
             'type'          => 'search',
             'search_query'  => $request->query('search'), 
             'filters'       => $fullActivityLog,
-            'results_count' => $books->count(), // Для коллекции count
+            'results_count' => $books->count(),
             'locale'        => app()->getLocale(),
             'user_ip'       => $request->ip()
         ]);
