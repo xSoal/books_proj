@@ -221,10 +221,8 @@
                                 <div class="badges-list">
                                     @foreach($item->edition_types as $type)
                                         @php
-                                            // dd($item->id);
                                             $typeTranslation = $type->translates->firstWhere('lang', app()->getLocale());
                                         @endphp
-                                        {{ $item->id }}
                                         <span class="badge badge-type">{{ $typeTranslation->name ?? '—' }}</span>
                                     @endforeach
                                 </div>
