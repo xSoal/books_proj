@@ -176,7 +176,7 @@
 
     <main id="main-content" class="content">
         <div class="results-header">
-            <div class="results-count">{{ $translates['records_found'] }} {{ count($books) }}</div>
+            <div class="results-count">{{ $translates['records_found'] }} {{ $books->total() }}</div>
             <div class="sorting-controls">
                 <label for="sort">{{ $translates['sort_by'] }}</label>
                 <?php
@@ -311,6 +311,10 @@
 
                 </article>
             @endforeach
+
+            <div class="pagination-container">
+                {{ $books->links() }}
+            </div>
 
         </div>
     </main>

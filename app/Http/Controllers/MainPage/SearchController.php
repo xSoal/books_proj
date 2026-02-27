@@ -295,7 +295,7 @@ class SearchController extends Controller
         'char_vals.translates'
     ])
     ->groupBy('books.id') 
-    ->get();
+    ->paginate(25);
 
     
     $books->each(function($b) {

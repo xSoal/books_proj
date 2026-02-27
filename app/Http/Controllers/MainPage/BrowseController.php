@@ -39,7 +39,7 @@ class BrowseController extends Controller
 
         $order = $request->query('order');
 
-        $query = Book::select('books.*')->where('books.active', 1);
+        $query = Book::select('books.*')->where('books.active', 1)->where('books.need_approve', false);
 
         if ($order) {
             $parts = explode('-', $order);
@@ -89,7 +89,7 @@ class BrowseController extends Controller
         }
         
         // 2. Убираем distinct(), если нет фильтрации через whereHas, вызывающей дубли
-        $books = $query->with('translates')->paginate(5)->withQueryString();
+        $books = $query->with('translates')->paginate(25)->withQueryString();
         
         $books->each(fn($b) => $b->setRelation('translates', $b->translates->keyBy('lang')));
 
