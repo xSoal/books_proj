@@ -77,272 +77,260 @@ class ImportController extends Controller
         return $slug;
     }
 
-
-
     public function add(Request $request) {
         $langs = ['ua', 'en'];
         $fields_to_ignore = ['Дизайн'];
-        $tags = ['Ключові слова', 'Key words'];
-        // Очистка старых данных (только тех, что не одобрены)
+        $tags_headers = ['Ключові слова', 'Key words'];
+    
+        // 1. Очистка старых данных (только тех, что не одобрены)
         Characteristic::where('need_approve', true)->delete();
         CharacteristicValue::where('need_approve', true)->delete();
         Book::where('need_approve', true)->delete();
-
+    
         $request->validate(['exel_file' => 'required|mimes:xlsx']);
-
+    
         $data = Excel::toArray(new StringValueBinder, $request->file('exel_file'))[0];
-        if (empty($data)) return back()->with('error', 'Файл пуст');
-
+        if (empty($data)) return back()->with('error', 'Файл порожній');
+    
         $headers = array_shift($data);
         array_shift($headers); // Убираем колонку ID/A
-
+    
+        // --- ОПТИМИЗАЦИЯ: ПРЕДЗАГРУЗКА ДАННЫХ В ПАМЯТЬ ---
+        DB::disableQueryLog();
+    
+        // Загружаем слаги, чтобы не делать SELECT EXISTS в цикле
+        $usedBookSlugs = DB::table('books_translates')->pluck('slug')->flip()->toArray();
+        $usedCharSlugs = DB::table('characteristics_translates')->pluck('slug')->flip()->toArray();
+        $usedValSlugs  = DB::table('char_vals_trans')->pluck('slug')->flip()->toArray();
+        $usedTagSlugs  = DB::table('tags_translates')->pluck('slug')->flip()->toArray();
+    
+        // Справочники ID (ускоряют поиск характеристик и тегов в 1000 раз)
+        $existingChars = CharacteristicTranslate::where('lang', 'ua')->pluck('characteristic_id', 'name')->toArray();
+        $existingTags  = TagTranslate::where('lang', 'ua')->pluck('tag_id', 'name')->toArray();
+        
+        // Сложный справочник для значений: $existingValues[char_id][val_name_ua] = val_id
+        $existingValues = [];
+        $allValues = DB::table('char_vals_trans')
+            ->join('char_vals', 'char_vals.id', '=', 'char_vals_trans.char_val_id')
+            ->where('char_vals_trans.lang', 'ua')
+            ->select('char_vals.characteristic_id', 'char_vals.id', 'char_vals_trans.name')
+            ->get();
+        
+        foreach ($allValues as $v) {
+            $existingValues[$v->characteristic_id][$v->name] = $v->id;
+        }
+    
         $static_book_fields = ['Порядковий номер видання' => 'sort'];
         $static_book_translates_fields = [
             'Назва' => 'name',
             'Анотація' => 'anotation',
         ];
-
+    
         $fields_chars_exception_with_one_lang = [
             'Рік(роки) / Year(s)' => ['ua' => 'Рік(роки)', 'en' => 'Year(s)'],
             'ISBN' => ['ua' => 'ISBN', 'en' => 'ISBN'],
-            'ISSN' => ['ua' => 'ISSN', 'en' => 'ISSN'],
+            'ISSN' => ['ua' => 'ISSN', 'en' => 'ISBN'],
             'Number of volumes' => ['ua' => 'Кількість томів', 'en' => 'Number of volumes'],
             'Volume / Issue' => ['ua' => 'Том / Випуск', 'en' => 'Volume / Issue'],
             'DOI' => ['ua' => 'DOI', 'en' => 'DOI'],
             'Website' => ['ua' => 'Website', 'en' => 'Website'],
             'URL' => ['ua' => 'URL', 'en' => 'URL'],
         ];
-
+    
         $error_messages = [];
-
-        foreach ($data as $index => $bookRow) {
-            array_shift($bookRow); 
-            if (empty($bookRow[0])) {
-                // $error_messages[] = "Строка {$index}: пустая первая колонка";
-                continue;
-            }
-        
-            $checkName = $this->cleanString($bookRow[8] ?? ''); 
-            if (empty($checkName)) {
-                $row = $index + 2;
-                $error_messages[] = "Рядок $row : порожня назва, або помилка читання $bookRow[8]";
-                continue;
-            }
-
+    
+        // --- НАЧАЛО ТРАНЗАКЦИИ ---
+        DB::beginTransaction();
+        try {
+            foreach ($data as $index => $bookRow) {
+                array_shift($bookRow); 
+                if (empty($bookRow[0])) continue;
             
-            // if (empty(trim($bookRow[3] ?? '')) && empty(trim($bookRow[4] ?? ''))) {
-            //      // Раскомментируй строку ниже, чтобы увидеть номера строк, которые не прошли
-            //      $error_messages[] = "Строка {$index + 2}: пропущена по условию колонок 3 и 4. Название: " . $checkName;
-            //      continue;
-            // }
-
-
-
-            $current_book_static_fields = [];
-            $current_book_static_translates = [];
-            $current_book_dynamic_translates = [];
-            $current_book_tags_ids = [];
-
-            for ($i = 0; $i < count($bookRow); $i++) {
-                $current_val = $this->cleanString($bookRow[$i] ?? '');
-                $header_name = $this->cleanString($headers[$i] ?? '');
-
-                if (!$header_name) continue;
-
-                if (isset($static_book_fields[$header_name])) {
-                    $current_book_static_fields[$static_book_fields[$header_name]] = $current_val;
+                $checkName = $this->cleanString($bookRow[8] ?? ''); 
+                if (empty($checkName)) {
+                    $error_messages[] = "Рядок " . ($index + 2) . ": порожня назва";
                     continue;
                 }
-
-                if (isset($static_book_translates_fields[$header_name])) {
-                    $field_model_name = $static_book_translates_fields[$header_name];
+    
+                $current_book_static_fields = [];
+                $current_book_static_translates = [];
+                $current_book_dynamic_translates = [];
+                $current_book_tags_ids = [];
+    
+                for ($i = 0; $i < count($bookRow); $i++) {
+                    $current_val = $this->cleanString($bookRow[$i] ?? '');
+                    $header_name = $this->cleanString($headers[$i] ?? '');
+    
+                    if (!$header_name) continue;
+    
+                    if (isset($static_book_fields[$header_name])) {
+                        $current_book_static_fields[$static_book_fields[$header_name]] = $current_val;
+                        continue;
+                    }
+    
+                    if (isset($static_book_translates_fields[$header_name])) {
+                        $field_model_name = $static_book_translates_fields[$header_name];
+                        $val_ua = $current_val;
+                        $val_en = $this->cleanString($bookRow[$i + 1] ?? '');
+                        $current_book_static_translates[$header_name] = [
+                            'ua' => $val_ua ?: $val_en,
+                            'en' => $val_en ?: $val_ua,
+                            'field_model_name' => $field_model_name
+                        ];
+                        $i++; continue;
+                    }
+    
+                    if (in_array($header_name, $fields_to_ignore)) continue;
+    
+                    // Обработка ТЕГОВ (оптимизировано)
+                    if (in_array($header_name, $tags_headers)){
+                        $tag_name_ua = explode(',', $current_val);
+                        $tag_name_en = explode(',', $this->cleanString($bookRow[$i + 1] ?? ''));
+                        $max_t = max(count($tag_name_ua), count($tag_name_en));
+    
+                        for ($e = 0; $e < $max_t; $e++) {
+                            $n_ua = $this->cleanString($tag_name_ua[$e] ?? '');
+                            $n_en = $this->cleanString($tag_name_en[$e] ?? '');
+                            $search_n = !empty($n_ua) ? $n_ua : $n_en;
+                            if (empty($search_n)) continue;
+    
+                            if (!isset($existingTags[$search_n])) {
+                                $tag = Tag::create();
+                                foreach (['ua' => $n_ua, 'en' => $n_en] as $l => $v) {
+                                    $finalV = !empty($v) ? $v : $search_n;
+                                    TagTranslate::create([
+                                        'tag_id' => $tag->id, 'lang' => $l, 'name' => $finalV,
+                                        'slug' => $this->fastSlug($finalV, $usedTagSlugs)
+                                    ]);
+                                }
+                                $existingTags[$search_n] = $tag->id;
+                            }
+                            $current_book_tags_ids[] = $existingTags[$search_n];
+                        }
+                        $i++; continue;
+                    }
+    
+                    if (isset($fields_chars_exception_with_one_lang[$header_name])) {
+                        $current_book_dynamic_translates[] = [
+                            'header_ua' => $fields_chars_exception_with_one_lang[$header_name]['ua'],
+                            'header_en' => $fields_chars_exception_with_one_lang[$header_name]['en'],
+                            'val_ua' => $current_val, 'val_en' => $current_val
+                        ];
+                        continue;
+                    }
+    
                     $val_ua = $current_val;
                     $val_en = $this->cleanString($bookRow[$i + 1] ?? '');
+                    $header_ua = $header_name;
+                    $header_en = $this->cleanString($headers[$i + 1] ?? '');
+    
+                    if ($header_ua && $header_en) {
+                        $current_book_dynamic_translates[] = [
+                            'header_ua' => $header_ua, 'header_en' => $header_en,
+                            'val_ua' => $val_ua ?: $val_en, 'val_en' => $val_en ?: $val_ua
+                        ];
+                        $i++;
+                    }
+                }
+    
+                // --- СОЗДАНИЕ КНИГИ ---
+                $book = Book::create([
+                    'sort' => (int)($current_book_static_fields['sort'] ?? 1),
+                    'need_approve' => true
+                ]);
+    
+                foreach ($langs as $lang) {
+                    $raw_name = $current_book_static_translates['Назва'][$lang] ?? 'no-name';
                     
-                    $current_book_static_translates[$header_name] = [
-                        'ua' => $val_ua ?: $val_en,
-                        'en' => $val_en ?: $val_ua,
-                        'field_model_name' => $field_model_name
+                    // Создаем массив данных для перевода
+                    $translateData = [
+                        'book_id' => $book->id, // ЯВНО передаем ID книги
+                        'lang'    => $lang,
+                        'slug'    => $this->fastSlug($raw_name, $usedBookSlugs),
                     ];
-                    $i++; continue;
+    
+                    // Динамически добавляем name, anotation и другие поля из $current_book_static_translates
+                    foreach ($current_book_static_translates as $trans_data) {
+                        $translateData[$trans_data['field_model_name']] = $trans_data[$lang];
+                    }
+    
+                    // Используем DB::table или Model::create с полным массивом данных
+                    BookTranslate::create($translateData);
                 }
-
-                if (in_array($header_name, $fields_to_ignore)) continue;
-
-                if (in_array($header_name, $tags)){
-                    $tag_name_ua = explode(',', $current_val);
-                    $tag_name_en = explode(',', $this->cleanString($bookRow[$i + 1] ?? ''));
-                    $max_length = max(count($tag_name_ua), count($tag_name_en));
     
-                    for ($e = 0; $e < $max_length; $e++) {
-                        $name_ua = $this->cleanString($tag_name_ua[$e] ?? '');
-                        $name_en = $this->cleanString($tag_name_en[$e] ?? '');
-                        $search_name = !empty($name_ua) ? $name_ua : $name_en;
+                // --- ХАРАКТЕРИСТИКИ (ОПТИМИЗИРОВАНО) ---
+                $assigned_val_ids = [];
+                foreach ($current_book_dynamic_translates as $charArr) {
+                    $c_ua = $this->cleanString($charArr['header_ua']);
+                    $v_ua = $this->cleanString($charArr['val_ua']);
+                    if (empty($v_ua) || $v_ua === $c_ua) continue;
     
-                        if (empty($search_name)) continue;
-    
-                        // Ищем тег по любому из языков, чтобы не плодить дубликаты Tag
-                        $tagTrans = TagTranslate::where('name', $search_name)->first();
-    
-                        if (!$tagTrans) {
-                            $tag = new Tag();
-                            $tag->save();
-    
-                            // Создаем сразу ОБА перевода
-                            foreach (['ua' => $name_ua, 'en' => $name_en] as $l => $val) {
-                                $finalName = !empty($val) ? $val : $search_name;
-                                TagTranslate::create([
-                                    'tag_id' => $tag->id,
-                                    'lang'   => $l,
-                                    'name'   => $finalName,
-                                    'slug'   => $this->generateUniqueSlug(TagTranslate::class, $finalName)
-                                ]);
-                            }
-                        } else {
-                            $tag = Tag::find($tagTrans->tag_id);
+                    // 1. Характеристика
+                    if (!isset($existingChars[$c_ua])) {
+                        $char = Characteristic::create(['active' => 1, 'need_approve' => true, 'sort' => $book->sort]);
+                        foreach (['ua' => 'header_ua', 'en' => 'header_en'] as $lang => $key) {
+                            $n = $this->cleanString($charArr[$key]);
+                            CharacteristicTranslate::create([
+                                'characteristic_id' => $char->id, 'lang' => $lang, 'name' => $n,
+                                'slug' => $this->fastSlug($n, $usedCharSlugs), 'description' => ''
+                            ]);
                         }
-                        
-                        $current_book_tags_ids[$tag->id] = $tag->id;
+                        $existingChars[$c_ua] = $char->id;
                     }
-                    $i++; continue;
-                };
-
-                if (isset($fields_chars_exception_with_one_lang[$header_name])) {
-                    $current_book_dynamic_translates[] = [
-                        'header_ua' => $fields_chars_exception_with_one_lang[$header_name]['ua'],
-                        'header_en' => $fields_chars_exception_with_one_lang[$header_name]['en'],
-                        'val_ua' => $current_val,
-                        'val_en' => $current_val
-                    ];
-                    continue;
-                }
-
-                $val_ua = $current_val;
-                $val_en = $this->cleanString($bookRow[$i + 1] ?? '');
-                $header_ua = $header_name;
-                $header_en = $this->cleanString($headers[$i + 1] ?? '');
-
-                if ($header_ua && $header_en) {
-                    $current_book_dynamic_translates[] = [
-                        'header_ua' => $header_ua,
-                        'header_en' => $header_en,
-                        'val_ua' => $val_ua ?: $val_en,
-                        'val_en' => $val_en ?: $val_ua
-                    ];
-                    $i++;
-                }
-            }
-
-            // --- СОЗДАНИЕ КНИГИ ---
-            $book = new Book();
-            $book->sort = (!empty($current_book_static_fields['sort'])) ? (int)$current_book_static_fields['sort'] : 1;
-            $book->need_approve = true;
-            $book->save();
-
-            foreach ($langs as $lang) {
-                $book_translate = new BookTranslate();
-                $book_translate->book_id = $book->id;
-                $book_translate->lang = $lang;
-                
-                $raw_name = $current_book_static_translates['Назва'][$lang] ?? 'no-name';
-                $book_translate->slug = $this->generateUniqueSlug(BookTranslate::class, $raw_name);
-
-                foreach ($current_book_static_translates as $trans_data) {
-                    $book_translate[$trans_data['field_model_name']] = $trans_data[$lang];
-                }
-                $book_translate->save();
-            }
-
-            // --- ХАРАКТЕРИСТИКИ ---
-            $assigned_val_ids = [];
-
-            foreach ($current_book_dynamic_translates as $charArr) {
-                $val_ua_name = $this->cleanString($charArr['val_ua']);
-                $char_ua_name = $this->cleanString($charArr['header_ua']);
-
-                if (empty($val_ua_name) || $val_ua_name === $char_ua_name) continue;
-
-                $char_trans = CharacteristicTranslate::where('lang', 'ua')
-                    ->where('name', $char_ua_name)
-                    ->first();
-
-                if (!$char_trans) {
-                    $char = new Characteristic(['active' => 1, 'need_approve' => true, 'sort' => $book->sort]);
-                    $char->save();
-
-                    foreach (['ua' => 'header_ua', 'en' => 'header_en'] as $lang => $key) {
-                        $name = $this->cleanString($charArr[$key]);
-                        CharacteristicTranslate::create([
-                            'characteristic_id' => $char->id,
-                            'lang' => $lang,
-                            'name' => $name,
-                            'slug' => $this->generateUniqueSlug(CharacteristicTranslate::class, $name),
-                            'description' => ''
-                        ]);
+                    $charId = $existingChars[$c_ua];
+    
+                    // 2. Значение
+                    if (!isset($existingValues[$charId][$v_ua])) {
+                        $cv = CharacteristicValue::create(['characteristic_id' => $charId, 'active' => 1, 'need_approve' => true]);
+                        foreach (['ua' => 'val_ua', 'en' => 'val_en'] as $lang => $key) {
+                            $n = $this->cleanString($charArr[$key]);
+                            CharacteristicValueTranslate::create([
+                                'char_val_id' => $cv->id, 'lang' => $lang, 'name' => $n,
+                                'slug' => $this->fastSlug($n, $usedValSlugs), 'description' => ''
+                            ]);
+                        }
+                        $existingValues[$charId][$v_ua] = $cv->id;
                     }
-                } else {
-                    $char = Characteristic::find($char_trans->characteristic_id);
-                }
-
-                $char_val = CharacteristicValue::where('characteristic_id', $char->id)
-                    ->whereHas('translates', function($q) use ($val_ua_name) {
-                        $q->where('lang', 'ua')->where('name', $val_ua_name);
-                    })->first();
-
-                if (!$char_val) {
-                    $char_val = new CharacteristicValue(['characteristic_id' => $char->id, 'active' => 1, 'need_approve' => true]);
-                    $char_val->save();
-
-                    foreach (['ua' => 'val_ua', 'en' => 'val_en'] as $lang => $key) {
-                        $name = $this->cleanString($charArr[$key]);
-                        CharacteristicValueTranslate::create([
-                            'char_val_id' => $char_val->id,
-                            'lang' => $lang,
-                            'name' => $name,
-                            'slug' => $this->generateUniqueSlug(CharacteristicValueTranslate::class, $name),
-                            'description' => ''
-                        ]);
-                    }
-                }
-
-
-                
-                $assigned_val_ids[$char_val->id] = [
-                    'book_id' => $book->id,
-                    'char_val_id' => $char_val->id,
-                    'created_at' => now(),
-                    'updated_at' => now()
-                ];
-            }
-
-            // теги
-            if (!empty($current_book_tags_ids)) {
-                $tag_data = [];
-                foreach ($current_book_tags_ids as $tagId) {
-                    $tag_data[] = [
-                        'book_id' => $book->id,
-                        'tag_id'  => $tagId
+                    $valId = $existingValues[$charId][$v_ua];
+                    $assigned_val_ids[] = [
+                        'book_id' => $book->id, 'char_val_id' => $valId,
+                        'created_at' => now(), 'updated_at' => now()
                     ];
                 }
-                DB::table('books_tags')->insertOrIgnore($tag_data);
+    
+                // Вставка связей
+                if (!empty($current_book_tags_ids)) {
+                    $tag_sync = array_map(fn($id) => ['book_id' => $book->id, 'tag_id' => $id], $current_book_tags_ids);
+                    DB::table('books_tags')->insertOrIgnore($tag_sync);
+                }
+                if (!empty($assigned_val_ids)) {
+                    DB::table('books_char_val')->insert($assigned_val_ids);
+                }
             }
-
-
-            if (!empty($assigned_val_ids)) {
-                DB::table('books_char_val')->insert(array_values($assigned_val_ids));
-            }
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Ошибка импорта: ' . $e->getMessage() . " (Строка " . ($index ?? 'неизвестно') . ")");
         }
-
-        // dd($error_messages);
-
-        return redirect()
-            ->route('admin.import')
-            ->with([
-                'success' => 'Імпорт завершено', 
-                'error_messages' => $error_messages
-            ]);
-
+    
+        return redirect()->route('admin.import')->with(['success' => 'Імпорт завершено', 'error_messages' => $error_messages]);
     }
+    
+    // Вспомогательная функция для генерации слага БЕЗ запросов к БД
+    private function fastSlug($name, &$usedSlugs) {
+        $slug = Str::slug($name) ?: 'n-a';
+        $original = $slug;
+        $i = 1;
+        while (isset($usedSlugs[$slug])) {
+            $slug = $original . '-' . $i++;
+        }
+        $usedSlugs[$slug] = true;
+        return $slug;
+    }
+
+
+
+
 }
 
 class StringValueBinder extends DefaultValueBinder implements IValueBinder

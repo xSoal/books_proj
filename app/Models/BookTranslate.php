@@ -12,6 +12,7 @@ class BookTranslate extends Model
     protected $table = 'books_translates';
 
     protected $fillable = [
+        'book_id',
         'lang',
         'slug',
         'name',
